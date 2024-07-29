@@ -1,0 +1,27 @@
+[General]
+# Enable this config
+# default: true
+enable=true
+# Save Logs
+# default: false
+logs=false
+# 1: info, 2: debug,
+# Console and logs use this
+# default: 1
+debuglevel=1
+# Binding IP
+# default: "0.0.0.0"
+ip = "0.0.0.0"
+# Service listening port
+# default: 30000
+port=30000
+
+[Server.0]
+# Mojang Offical Server
+Name="Mojang"
+Url="https://sessionserver.mojang.com"
+
+[Server.1]
+# LittleSkin Server
+Name="LittleSkin"
+Url="https://littleskin.cn/api/yggdrasil/sessionserver"
