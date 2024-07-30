@@ -1,4 +1,11 @@
-.venv
+# 文件夹
+venv
+venv*
+venvs
 configs
 build
 .idea
+__pycache__
+logs
+
+# 文件

@@ -1,20 +1,27 @@
-import sys
-import tomllib
+import json
 import os
-import re
-import socket
+import sys
+
+import json5
+import yaml
 from colorama import Fore, Style
+
+from modules.tools import config_check
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 
 # 判断配置文件类型
-class FindConfig:
-    def __init__(self, import_path: str, import_extension: int):
+class ConfigParsing:
+    def __init__(self, import_path: str, import_config_extension: str):
         self.configDir = import_path
-        self.configDirList = None
-        self.configFile = list()
+        self.configFile = str()
         self.configFileList = set()
-        self.setExtension = import_extension
-        self.endswith = ('toml', 'json', 'json5')
+        self.selectExtension = import_config_extension
+        self.endswith = ('toml', 'json', 'json5', 'yaml')
         # 检查文件夹是否存在,不存在则创建
         if not os.path.exists(self.configDir):
             os.mkdir(self.configDir)
@@ -24,118 +31,109 @@ class FindConfig:
         if len(os.listdir(self.configDir)) == 0:
             return False
         else:
-            self.configDirList = os.listdir(self.configDir)
+            config_list = set(os.listdir(self.configDir))
             pass
 
         # 检查文件扩展名
-        for filename in self.configDirList:
+        for filename in config_list:
             if filename.endswith(self.endswith):
-                self.configFileList.add(filename)
-        if len(self.configFileList) == 0:
+                config_list.add(filename)
+        if len(config_list) == 0:
             return False
+        # 对配置文件列表进行排序
+        # 0为toml，1为json，2为json5，3为yaml
+        suffix_order = {'.toml': 0, '.json': 1, 'json5': 2, 'yaml': 3}
+
+        def reordering(file):
+            _, ext = file.split('.')
+            return suffix_order.get('.' + ext, float('inf'))
+
+        self.configFileList = sorted(config_list, key=reordering)
         return True
 
-    def name(self):
-        # 指定配置文件优先级
-        ext = ""
-        if self.setExtension == 1:
-            ext = ".toml"
-        elif self.setExtension == 2:
-            ext = ".json"
-        elif self.setExtension == 3:
-            ext = ".json5"
-        # 多配置文件选择，未实现
-        self.configFile.append([i for i in self.configFileList if re.search(ext, i)])
-        def_output = "".join(self.configFile[0])
-        return self.configFileList, def_output, self.endswith[self.setExtension - 1]
-
-
-def config_check(self: dict) -> None:
-    # General块检查
-    def general():
-        # 类型检查
-        if not isinstance(self["General"]["enable"], bool):
-            sys.exit(Fore.RED + "enable is the wrong variable type" + Style.RESET_ALL)
-        if not isinstance(self["General"]["logs"], bool):
-            sys.exit(Fore.RED + "logs is the wrong variable type" + Style.RESET_ALL)
-        if not isinstance(self["General"]["debuglevel"], int):
-            sys.exit(Fore.RED + "debuglevel is the wrong variable type" + Style.RESET_ALL)
-        if not isinstance(self["General"]["ip"], str):
-            sys.exit(Fore.RED + "ip is the wrong variable type" + Style.RESET_ALL)
-        if not isinstance(self["General"]["port"], int):
-            sys.exit(Fore.RED + "enable is the wrong variable type" + Style.RESET_ALL)
-        # 判断配置文件是否启用
-        if not self["General"]["enable"]:
-            sys.exit(Fore.RED + "[CONFIG NOT ENABLE]" + Style.RESET_ALL)
-        # 检查IP地址格式是否正确
-        try:
-            socket.inet_aton(self["General"]["ip"])
+    # 加载配置文件
+    def load_general_config(self, import_config_file):
+        # 打开配置文件函数
+        def open_config(file_name) -> dict:
+            _, ext = os.path.splitext(file_name)
+            # 打开toml格式配置文件
+            if ext.lower() == '.toml':
+                with open(file_name, mode='rb') as fff:
+                    config_details = tomllib.load(fff)
+                    print(config_details)
+                    return config_details
+            # 打开json格式配置文件
+            elif ext.lower() == '.json':
+                with open(file_name, mode='rb') as fff:
+                    config_details = json.load(fff)
+                    config_check(config_details)
+                    return config_details
+            # 打开json5格式配置文件
+            elif ext.lower() == '.json5':
+                with open(file_name, mode='rb') as fff:
+                    config_details = json5.load(fff)
+                    config_check(config_details)
+                    return config_details
+            # 打开yaml格式配置文件
+            elif ext.lower() == '.yaml':
+                with (open(file_name, mode='rb') as fff):
+                    config_details = yaml.load(fff, Loader=yaml.FullLoader)
+                    config_check(config_details)
+                    return config_details
+            # 全都打不开执行这行退出程序，在这还整个退出搞得上面的检查是个小丑似的
+            else:
+                sys.exit(Fore.RED + "[Unsupported configuration file format]" + Style.RESET_ALL)
             pass
-        except socket.error:
-            sys.exit(Fore.RED + "[The IP address is incorrect]" + Style.RESET_ALL)
-        # 检查debuglevel值是否在范围内
-        debuglevel_value = (1, 2)
-        if not self["General"]["debuglevel"] in debuglevel_value:
-            sys.exit(Fore.RED + "debuglevel value is incorrect" + Style.RESET_ALL)
-        # 检查端口是否在正确范围内
-        if not 1 <= self["General"]["port"] <= 65535:
-            sys.exit(Fore.RED + "port value is incorrect" + Style.RESET_ALL)
-        pass
 
-    # 检查Server块
-    def server():
-        # 检查IP URL格式
-        def check_ip(ip):
-            try:
-                socket.inet_aton(ip)
-                return True
-            except socket.error:
-                return False
+        # 判断并获取默认配置文件的后缀与文件名
+        if self.selectExtension == 'toml':
+            default_config_file = [file for file in self.configFileList if file.endswith('.toml')]
+        elif self.selectExtension == 'json':
+            default_config_file = [file for file in self.configFileList if file.endswith('.json')]
+        elif self.selectExtension == 'json5':
+            default_config_file = [file for file in self.configFileList if file.endswith('.json5')]
+        elif self.selectExtension == 'yaml':
+            default_config_file = [file for file in self.configFileList if file.endswith('.yaml')]
+        else:
+            sys.exit(Fore.RED + "[Wrong choice of default suffix parameter]" + Style.RESET_ALL)
 
-        # 检查普通URL格式
-        def check_url(url):
-            url_pattern = re.compile(r'^(http|https)://[a-zA-Z0-9-._~:/?#[\]@!$&\'()*+,;=]+')
-            if url_pattern.match(url):
-                return True
-            else:
-                return False
+        # 检查输入参数是否为空，空则将默认配置文件覆盖进来
+        if import_config_file is None:
+            self.configFile = self.configDir + os.sep + default_config_file[0]
+            print(self.configFile)
+        else:
+            self.configFile = import_config_file
+            print(self.configFile)
 
-        # 使用for循环检查多个服务器链接和格式
-        for i in range(len(self["Server"])):
-            # 检查变量格式
-            if not isinstance(self["Server"][str(i)]["Name"], str):
-                sys.exit(Fore.RED + f"Name is the wrong variable type in Server.{i}" + Style.RESET_ALL)
-            if not isinstance(self["Server"][str(i)]["Url"], str):
-                sys.exit(Fore.RED + f"Url is the wrong variable type in Server.{i}" + Style.RESET_ALL)
-            # 执行网址检查
-            if check_ip(self["Server"][str(i)]["Url"]):
-                pass
-            elif check_url(self["Server"][str(i)]["Url"]):
-                pass
-            else:
-                sys.exit(Fore.RED + f"The Server.{i} URL is incorrect" + Style.RESET_ALL)
-        pass
+        # 初始化临时保存配置变量
+        def_logs = bool()
+        def_debuglevel = int()
+        def_ip = str()
+        def_port = int()
 
-    general()
-    server()
-    pass
-
-
-# 配置文件解析
-class ConfigParsing:
-    # toml配置文件读取
-    def general_read_toml(self: str):
-        # 加载配置文件
-        with open(str(self), mode="r+b") as file:
-            config_data = tomllib.load(file)
-        # 输出配置并检查
-        print(config_data)
-        config_check(config_data)
-        # 解析配置
-        def_logs: bool = config_data["General"]["logs"]
-        def_debuglevel: int = config_data["General"]["debuglevel"]
-        def_ip: str = config_data["General"]["ip"]
-        def_port: int = config_data["General"]["port"]
-
-        print(Fore.GREEN + "[Config Loaded]" + Style.RESET_ALL)
-        return def_logs, def_debuglevel, def_ip, def_port
+        # 尝试打开配置文件
+        try:
+            config_data = open_config(self.configFile)
+            def_logs: bool = config_data["General"]["logs"]
+            def_debuglevel: int = config_data["General"]["debuglevel"]
+            def_ip: str = config_data["General"]["ip"]
+            def_port: int = config_data["General"]["port"]
+            print(Fore.GREEN + "[Config Loaded]" + Style.RESET_ALL)
+        # 无法打开则切换配置文件进行打开
+        except FileNotFoundError:
+            print(f"Can not open {self.configFile},try next")
+            self.configFileList.remove(default_config_file)
+            for alt_file_name in self.configFileList:
+                try:
+                    config_data = open_config(self.configDir + os.sep + alt_file_name)
+                    def_logs: bool = config_data["General"]["logs"]
+                    def_debuglevel: int = config_data["General"]["debuglevel"]
+                    def_ip: str = config_data["General"]["ip"]
+                    def_port: int = config_data["General"]["port"]
+                    print(Fore.GREEN + "[Config Loaded]" + Style.RESET_ALL)
+                    self.configFile = self.configDir + os.sep + alt_file_name
+                    break
+                # 这更是个小丑
+                except FileNotFoundError:
+                    print(f"Can not open {alt_file_name},try next")
+        return self.configFileList, self.configFile, def_logs, def_debuglevel, def_ip, def_port

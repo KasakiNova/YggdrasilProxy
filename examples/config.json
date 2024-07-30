@@ -1,0 +1,19 @@
+{
+  "General": {
+    "enable": true,
+    "logs": false,
+    "debuglevel": 1,
+    "ip": "0.0.0.0",
+    "port": 30000
+  },
+  "Server": {
+    "0": {
+      "Name": "Mojang",
+      "Url": "https://sessionserver.mojang.com"
+    },
+    "1": {
+      "Name": "LittleSkin",
+      "Url": "https://littleskin.cn/api/yggdrasil/sessionserver"
+    }
+  }
+}
