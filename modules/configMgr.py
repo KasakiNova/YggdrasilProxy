@@ -11,7 +11,7 @@ except ModuleNotFoundError:
 # 判断配置文件类型
 class ConfigParsing:
     def __init__(self, import_path: str, import_config_extension: str):
-        self.configData = None
+        self.configData = dict()
         self.configDir = import_path
         self.configFile = str()
         self.configFileList = set()
@@ -59,11 +59,11 @@ class ConfigParsing:
             print(self.configFile)
 
         # 初始化临时保存配置变量
-        self.configData = dict()
         def_logs = bool()
         def_debuglevel = int()
         def_ip = str()
         def_port = int()
+        def_prefix = str()
 
         # 尝试打开配置文件
         try:
@@ -72,6 +72,7 @@ class ConfigParsing:
             def_debuglevel: int = self.configData["General"]["debuglevel"]
             def_ip: str = self.configData["General"]["ip"]
             def_port: int = self.configData["General"]["port"]
+            def_prefix: str = self.configData["General"]["prefix"]
         # 无法打开则切换配置文件进行打开
         except FileNotFoundError:
             print(f"Can not open {self.configFile},try next")
@@ -83,12 +84,15 @@ class ConfigParsing:
                     def_debuglevel: int = self.configData["General"]["debuglevel"]
                     def_ip: str = self.configData["General"]["ip"]
                     def_port: int = self.configData["General"]["port"]
+                    def_prefix: str = self.configData["General"]["prefix"]
                     self.configFile = self.configDir + os.sep + alt_file_name
                     break
                 # 这更是个小丑
                 except FileNotFoundError:
                     print(f"Can not open {alt_file_name},try next")
-        return self.configFileList, self.configFile, self.configData, def_logs, def_debuglevel, def_ip, def_port
+        return (self.configFileList, self.configFile, self.configData,
+                def_logs, def_debuglevel, def_ip, def_port, def_prefix)
 
-    def read_server_config(self):
+    def read_server_config(self, config_serial):
+        server_data = self.configData["Server"]
         pass

@@ -9,6 +9,8 @@ import tomllib
 import json5
 import yaml
 from colorama import Fore, Style
+from requests import get
+from modules.customError import GetPublickeyFailureError
 
 
 # 打印系统配置信息函数
@@ -17,13 +19,50 @@ def print_system_info() -> None:
     win32 = None
     if platform.system() == 'Windows':
         win32 = platform.win32_edition()
-        pass
 
     print(platform.system(), platform.version(), win32, platform.platform(), platform.machine(),
           platform.architecture(), "\n", platform.processor())
     print("Python Version", sys.version, "\n", sys.version_info)
     print()
     pass
+
+
+# publickeys更新
+def update_publickeys():
+    # 检查publickeys是否正确
+    def check_publickey_structure(json_data):
+        try:
+            for key in json_data:
+                if key not in ["profilePropertyKeys", "playerCertificateKeys"]:
+                    return False
+                if not isinstance(json_data[key], list):
+                    return False
+                for item in json_data[key]:
+                    if not isinstance(item, dict) or "publicKey" not in item:
+                        return False
+            return True
+        except json.JSONDecodeError:
+            return False
+    # 获取publickeys
+    # 如果无法从Mojang官方获取就从LittleSkin获取
+    try:
+        url = "https://api.minecraftservices.com/publickeys"
+        response = get(url)
+        if response.status_code == 200:
+            if check_publickey_structure(response.json()):
+                return response.json()
+            else:
+                raise GetPublickeyFailureError("Failed to fetch publickeys from Mojang.")
+        else:
+            raise GetPublickeyFailureError("Failed to fetch publickeys from Mojang.")
+    except GetPublickeyFailureError as error_info:
+        print(error_info)
+        url = "https://littleskin.cn/api/yggdrasil/minecraftservices/publickeys"
+        response = get(url=url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print("Failed to fetch publickeys from LittleSkin.")
 
 
 # 额外配置文件工具
