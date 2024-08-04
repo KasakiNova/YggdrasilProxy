@@ -1,11 +1,8 @@
 import os
 
-from modules.tools import ConfigTools
+import modules.globalVariables as Var
 
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
+from modules.tools import ConfigTools
 
 
 # 判断配置文件类型
@@ -53,26 +50,17 @@ class ConfigParsing:
         # 检查输入参数是否为空，空则将默认配置文件覆盖进来
         if import_config_file is None:
             self.configFile = self.configDir + os.sep + default_config_file[0]
-            print(self.configFile)
         else:
             self.configFile = import_config_file
-            print(self.configFile)
-
-        # 初始化临时保存配置变量
-        def_logs = bool()
-        def_debuglevel = int()
-        def_ip = str()
-        def_port = int()
-        def_prefix = str()
 
         # 尝试打开配置文件
         try:
             self.configData = ConfigTools.open_config(self.configFile)
-            def_logs: bool = self.configData["General"]["logs"]
-            def_debuglevel: int = self.configData["General"]["debuglevel"]
-            def_ip: str = self.configData["General"]["ip"]
-            def_port: int = self.configData["General"]["port"]
-            def_prefix: str = self.configData["General"]["prefix"]
+            Var.logs = self.configData["General"]["logs"]
+            Var.debuglevel = self.configData["General"]["debuglevel"]
+            Var.ip = self.configData["General"]["ip"]
+            Var.port = self.configData["General"]["port"]
+            Var.updatePublickeysTime = self.configData["General"]["UpdatePublickeysTime"]
         # 无法打开则切换配置文件进行打开
         except FileNotFoundError:
             print(f"Can not open {self.configFile},try next")
@@ -80,19 +68,21 @@ class ConfigParsing:
             for alt_file_name in self.configFileList:
                 try:
                     self.configData = ConfigTools.open_config(self.configDir + os.sep + alt_file_name)
-                    def_logs: bool = self.configData["General"]["logs"]
-                    def_debuglevel: int = self.configData["General"]["debuglevel"]
-                    def_ip: str = self.configData["General"]["ip"]
-                    def_port: int = self.configData["General"]["port"]
-                    def_prefix: str = self.configData["General"]["prefix"]
+                    Var.logs = self.configData["General"]["logs"]
+                    Var.debuglevel = self.configData["General"]["debuglevel"]
+                    Var.ip = self.configData["General"]["ip"]
+                    Var.port = self.configData["General"]["port"]
                     self.configFile = self.configDir + os.sep + alt_file_name
                     break
-                # 这更是个小丑
-                except FileNotFoundError:
+                except FileNotFoundError:  # 这更是个小丑
                     print(f"Can not open {alt_file_name},try next")
-        return (self.configFileList, self.configFile, self.configData,
-                def_logs, def_debuglevel, def_ip, def_port, def_prefix)
+        return self.configFileList, self.configFile, self.configData
 
-    def read_server_config(self, config_serial):
+    def read_server_config(self, config_serial: int):
         server_data = self.configData["Server"]
+        def_name = server_data[str(config_serial)]["Name"]
+        print(def_name)
         pass
+
+
+
