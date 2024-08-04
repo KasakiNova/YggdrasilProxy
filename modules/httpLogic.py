@@ -3,8 +3,11 @@ import os
 
 from flask import Flask, jsonify, request
 
-from modules.profileRequest import request_mojang_server, request_bs_server
 import modules.globalVariables as Var
+
+from modules.profileRequest import request_mojang_server, request_bs_server
+from modules.configMgr import read_server_config
+from modules.customError import FailureToFetchProfileError
 
 app = Flask(__name__)
 
@@ -26,13 +29,35 @@ def publickeys():
 # hasJoined
 @app.get(rule="/sessionserver/session/minecraft/hasJoined")
 def has_joined():
+    # 获取参数
     server_id = request.args.get('serverId')
     username = request.args.get('username')
-    try:
-        user_profile = request_mojang_server(username, server_id)
-        print("official")
-        return jsonify(user_profile)
-    except ValueError:
-        user_profile = request_bs_server(username, server_id)
-        print("third party")
-        return jsonify(user_profile)
+    # 使用循环获取用户信息
+    for serial in range(len(Var.configData["Server"])):
+        name, proxy, url, server_type = read_server_config(serial)
+        # Mojang官方
+        if server_type == "official":
+            try:
+                profile_data = request_mojang_server(username=username, server_id=server_id)
+                if profile_data == "Error":
+                    raise FailureToFetchProfileError(f"Unable to get {username} profile from {name} server")
+                else:
+                    return jsonify(profile_data)
+            except FailureToFetchProfileError as error_info:
+                serial += 1
+                print(error_info)
+                continue
+        # BlessingSkinServer
+        elif server_type == "blessing":
+            try:
+                profile_data = request_bs_server(import_url=url, username=username, server_id=server_id)
+                if profile_data == "Error":
+                    raise FailureToFetchProfileError(f"Unable to get {username} profile from {name} server")
+                else:
+                    return jsonify(profile_data)
+            except FailureToFetchProfileError as error_info:
+                serial += 1
+                print(error_info)
+                continue
+        else:
+            print("Unable to get player profile from All server")

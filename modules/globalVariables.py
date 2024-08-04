@@ -11,6 +11,6 @@ logs = bool()
 debuglevel = int()
 port = int()
 ip = str()
-config_data = dict()
+configData = dict()
 publickeys = None
 updatePublickeysTime = int()
