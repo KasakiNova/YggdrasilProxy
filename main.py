@@ -1,6 +1,7 @@
 import logging
 import sys
 import threading
+import time
 
 from colorama import Fore, Style
 from paste.translogger import TransLogger
@@ -21,6 +22,7 @@ opt_configFileName = None
 
 # 打印系统信息
 print_system_info()
+time.sleep(0.1)
 
 print(f"Service running in {Var.workDir}")
 
@@ -33,7 +35,8 @@ if config.check_config():
         print("General:\n", Var.configData['General'], "\nServer:\n", Var.configData['Server'])
     print(Fore.GREEN + "[Config Loaded]" + Style.RESET_ALL)
 else:
-    sys.exit("The configuration file cannot be found in configs\nBye!")
+    exit_info = "Please check the configs folder if you need to change the configuration files\nBye!"
+    sys.exit(Fore.RED + exit_info + Style.RESET_ALL)
 
 thread = threading.Thread(target=update_key_thread)
 thread.daemon = True

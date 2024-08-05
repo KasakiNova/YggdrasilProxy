@@ -20,7 +20,10 @@ class ConfigParsing:
 
     def check_config(self) -> bool:
         # 检查文件夹内是否存在配置文件
+        # 不存在则创建默认配置文件并退出程序
         if len(os.listdir(self.configDir)) == 0:
+            from modules.defaultConfig import create_def_config_file as def_config
+            def_config(str(self.configDir + os.sep))
             return False
         else:
             config_list = set(os.listdir(self.configDir))

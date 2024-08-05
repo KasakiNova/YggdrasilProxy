@@ -9,4 +9,4 @@ __pycache__
 logs
 
 # 文件
-modules/static/publickeys.json
+static/publickeys.json
