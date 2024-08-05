@@ -14,3 +14,8 @@ ip = str()
 configData = dict()
 publickeys = None
 updatePublickeysTime = int()
+# Proxy
+proxyEnable = bool()
+proxyLink = str()
+proxyUsername = str()
+proxyPassword = str()

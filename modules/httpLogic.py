@@ -15,7 +15,7 @@ app = Flask(__name__)
 # 访问根返回值
 @app.get(rule="/")
 def get_root():
-    path: str = f"{Var.workDir}{os.sep}modules{os.sep}static{os.sep}index.json"
+    path: str = f"{Var.workDir}{os.sep}static{os.sep}index.json"
     with open(path, mode="rb") as index:
         return jsonify(json.load(index))
 
