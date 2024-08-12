@@ -31,8 +31,16 @@ if config.check_config():
     (configList, configName, Var.configData) = config.load_config(opt_configFileName)
     print(f"Find {len(set(configList))} Configuration File")
     print("The configuration file has been found. The file is", Fore.CYAN + configName + Style.RESET_ALL)
+    # 依据debuglevel设定日志级别
     if Var.debuglevel == 2:
-        print("General:\n", Var.configData['General'], "\nServer:\n", Var.configData['Server'])
+        print("General:\n", Var.configData['General'])
+        print("Proxy:\n", Var.configData["Proxy"])
+        print("Server:\n", Var.configData['Server'])
+    # 如Proxy启用则检查是否能够使用
+    if Var.proxyEnable:
+        from modules.configTools import check_proxy
+        if not check_proxy():
+            sys.exit("Proxy is incorrect")
     print(Fore.GREEN + "[Config Loaded]" + Style.RESET_ALL)
 else:
     exit_info = "Please check the configs folder if you need to change the configuration files\nBye!"

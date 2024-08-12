@@ -6,8 +6,11 @@ import sys
 import tomllib
 
 import json5
+import requests.exceptions
 import yaml
 from colorama import Fore, Style
+
+import modules.globalVariables as Var
 
 
 class ConfigTools:
@@ -107,6 +110,7 @@ class ConfigTools:
         if ext.lower() == '.toml':
             with open(self, mode='rb') as fff:
                 config_details = tomllib.load(fff)
+                ConfigTools.config_check(config_details)
                 return config_details
         # 打开json格式配置文件
         elif ext.lower() == '.json':
@@ -132,6 +136,7 @@ class ConfigTools:
         pass
 
 
+# 检查服务器是mojang官方还是第三方
 def official_judgment(url):
     mojang_url = "sessionserver.mojang.com"
     blessing_url = "/api/yggdrasil"
@@ -145,3 +150,41 @@ def official_judgment(url):
     return server_type
 
 
+# 载入配置到全局
+def load_config_to_var(config_data):
+    # 加载代理配置
+    def read_proxy_config():
+        Var.proxyEnable = config_data["Proxy"]["enable"]
+        Var.proxyLink = config_data["Proxy"]["address"]
+        Var.proxyAuthEnable = config_data["Proxy"]["enable_auth"]
+        if Var.proxyAuthEnable:
+            Var.proxyUsername = config_data["Proxy"]["username"]
+            Var.proxyPassword = config_data["Proxy"]["password"]
+
+    # 载入基本配置
+    Var.logs = config_data["General"]["logs"]
+    Var.debuglevel = config_data["General"]["debuglevel"]
+    Var.ip = config_data["General"]["ip"]
+    Var.port = config_data["General"]["port"]
+    Var.updatePublickeysTime = config_data["General"]["UpdatePublickeysTime"]
+    Var.proxyEnable = config_data["Proxy"]["enable"]
+    if Var.proxyEnable:
+        read_proxy_config()
+
+
+# 检查Proxy是否能够访问
+def check_proxy():
+    from modules.tools import proxies_link
+    from modules.customError import ProxyError
+    from requests import get
+    try:
+        proxies = proxies_link()
+        response = get(url="https://api.myip.la", proxies=proxies)
+        if response.status_code == 200:
+            return True
+        else:
+            raise ProxyError
+    except requests.exceptions.ProxyError:
+        return False
+    except ProxyError:
+        return False

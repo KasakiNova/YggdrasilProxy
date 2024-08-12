@@ -14,3 +14,12 @@ class FailureToFetchProfileError(Exception):
 
     def __str__(self):
         return self.errorInfo
+
+
+class ProxyError(Exception):
+    def __init__(self):
+        super().__init__(self)
+        self.errorInfo = "Proxy Error"
+
+    def __str__(self):
+        return self.errorInfo

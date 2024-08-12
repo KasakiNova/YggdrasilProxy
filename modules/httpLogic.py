@@ -38,10 +38,11 @@ def has_joined():
         # Mojang官方
         if server_type == "official":
             try:
-                profile_data = request_mojang_server(username=username, server_id=server_id)
+                profile_data = request_mojang_server(username, server_id, proxy)
                 if profile_data == "Error":
                     raise FailureToFetchProfileError(f"Unable to get {username} profile from {name} server")
                 else:
+                    print(f"Successfully fetched player {username} in {name} server")
                     return jsonify(profile_data)
             except FailureToFetchProfileError as error_info:
                 serial += 1
@@ -50,14 +51,15 @@ def has_joined():
         # BlessingSkinServer
         elif server_type == "blessing":
             try:
-                profile_data = request_bs_server(import_url=url, username=username, server_id=server_id)
+                profile_data = request_bs_server(url, username, server_id, proxy)
                 if profile_data == "Error":
                     raise FailureToFetchProfileError(f"Unable to get {username} profile from {name} server")
                 else:
+                    print(f"Successfully fetched player {username} in {name} server")
                     return jsonify(profile_data)
             except FailureToFetchProfileError as error_info:
                 serial += 1
                 print(error_info)
                 continue
         else:
-            print("Unable to get player profile from All server")
+            print(f"Unable to get player {username} profile from All server")

@@ -10,3 +10,4 @@ logs
 
 # 文件
 static/publickeys.json
+static/index.json

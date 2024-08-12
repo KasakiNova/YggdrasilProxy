@@ -17,5 +17,6 @@ updatePublickeysTime = int()
 # Proxy
 proxyEnable = bool()
 proxyLink = str()
+proxyAuthEnable = bool()
 proxyUsername = str()
 proxyPassword = str()

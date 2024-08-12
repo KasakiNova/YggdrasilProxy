@@ -1,8 +1,9 @@
 import os
+import sys
 
 import modules.globalVariables as Var
 
-from modules.configTools import ConfigTools
+from modules.configTools import ConfigTools, load_config_to_var
 
 
 # 判断配置文件类型
@@ -14,21 +15,25 @@ class ConfigParsing:
         self.configFileList = set()
         self.selectExtension = import_config_extension
         self.endswith = ('toml', 'json', 'json5', 'yaml')
+
+    def check_config(self) -> bool:
         # 检查文件夹是否存在,不存在则创建
         if not os.path.exists(self.configDir):
             os.mkdir(self.configDir)
-
-    def check_config(self) -> bool:
+        if not os.path.exists(str(Var.workDir + os.sep + "static")):
+            os.mkdir(f"{Var.workDir}{os.sep}static")
         # 检查文件夹内是否存在配置文件
         # 不存在则创建默认配置文件并退出程序
         if len(os.listdir(self.configDir)) == 0:
-            from modules.defaultConfig import create_def_config_file as def_config
+            from modules.defaultConfig import create_config_file as def_config
             def_config(str(self.configDir + os.sep))
             return False
         else:
             config_list = set(os.listdir(self.configDir))
-            pass
-
+        # 检查static文件夹内index.json是否存在
+        if not os.path.exists(str(Var.workDir + os.sep + "static" + os.sep + "index.json")):
+            from modules.defaultConfig import create_index_file as def_index
+            def_index(str(Var.workDir + os.sep + "static" + os.sep))
         # 检查文件扩展名
         for filename in config_list:
             if filename.endswith(self.endswith):
@@ -59,22 +64,15 @@ class ConfigParsing:
         # 尝试打开配置文件
         try:
             self.configData = ConfigTools.open_config(self.configFile)
-            Var.logs = self.configData["General"]["logs"]
-            Var.debuglevel = self.configData["General"]["debuglevel"]
-            Var.ip = self.configData["General"]["ip"]
-            Var.port = self.configData["General"]["port"]
-            Var.updatePublickeysTime = self.configData["General"]["UpdatePublickeysTime"]
+            load_config_to_var(self.configData)
         # 无法打开则切换配置文件进行打开
         except FileNotFoundError:
             print(f"Can not open {self.configFile},try next")
             self.configFileList.remove(default_config_file)
             for alt_file_name in self.configFileList:
                 try:
-                    self.configData = ConfigTools.open_config(self.configDir + os.sep + alt_file_name)
-                    Var.logs = self.configData["General"]["logs"]
-                    Var.debuglevel = self.configData["General"]["debuglevel"]
-                    Var.ip = self.configData["General"]["ip"]
-                    Var.port = self.configData["General"]["port"]
+                    self.configData = ConfigTools.open_config(self.configFile)
+                    load_config_to_var(self.configData)
                     self.configFile = self.configDir + os.sep + alt_file_name
                     break
                 except FileNotFoundError:  # 这更是个小丑
