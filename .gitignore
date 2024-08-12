@@ -1,4 +1,5 @@
 # 文件夹
+.venv
 venv
 venv*
 venvs
