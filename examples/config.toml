@@ -10,18 +10,41 @@ logs=false
 # default: 1
 debuglevel=1
 # Binding IP
-# default: "0.0.0.0"
-ip = "0.0.0.0"
+# default: "127.0.0.1"
+ip = "127.0.0.1"
 # Service listening port
 # default: 30000
 port=30000
+# Publickeys Update time
+# Default: 7200
+UpdatePublickeysTime=7200
+
+[Proxy]
+# Enable Proxy
+# Default: false
+enable=false
+# Proxy Address
+# Protocol input required
+# Examples: address="http://127.0.0.1:8080"
+# Supported Protocols: http, https
+address=""
+# Enable Auth
+# Default: false
+enable_auth=false
+# Proxy Auth Username
+username=""
+# Proxy Auth Password
+password=""
 
 [Server.0]
 # Mojang Offical Server
 Name="Mojang"
+NeedProxy=false
 Url="https://sessionserver.mojang.com"
 
 [Server.1]
 # LittleSkin Server
 Name="LittleSkin"
-Url="https://littleskin.cn/api/yggdrasil/sessionserver"
+NeedProxy=false
+Url="https://littleskin.cn/api/yggdrasil"
+
