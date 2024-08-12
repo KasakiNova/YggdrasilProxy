@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
 # 设定变量
-outputFileName="AndreaYggdrasilProxy"
-outputPath="./build"
-sourceFile="launcher.py"
+outputFileName="YggdrasilProxy"
+outputPath="build"
+sourceFile="main.py"
 systemThread=$(nproc)
 pypiLink="https://pypi.mirrors.ustc.edu.cn/simple"
 # 判断输出目录是否存在
