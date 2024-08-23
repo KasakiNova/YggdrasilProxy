@@ -3,7 +3,10 @@ import os
 import re
 import socket
 import sys
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 import json5
 import requests.exceptions
