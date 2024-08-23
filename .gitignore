@@ -3,6 +3,7 @@
 venv
 venv*
 venvs
+buildVenv
 configs
 build
 .idea
