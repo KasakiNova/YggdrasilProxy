@@ -2,8 +2,9 @@
 
 # 设定变量
 version="snapshots"
-platform=$(uname -p)
-outputFileName="YggdrasilProxy-${platform}-${version}"
+platform=$(uname -m)
+system=$(uname -s)
+outputFileName="YggdrasilProxy-${system}-${platform}-${version}"
 outputPath="build"
 sourceFile="main.py"
 systemThread=$(nproc)
@@ -20,14 +21,15 @@ fi
 
 source ./buildVenv/bin/activate
 
-pip install --upgrade pip
+pip install --upgrade pip -i ${pypiLink}
 pip install -r requirements.txt -i ${pypiLink}
 pip install nuitka -i ${pypiLink}
 
 time python3 -m nuitka \
   --follow-imports --standalone --onefile \
   --show-memory --show-progress \
-  --include-package=requests --jobs="${systemThread}" \
+  --include-package=requests \
+  --jobs="${systemThread}" --lto=yes --clang \
   --output-dir=${outputPath} --output-filename="${outputFileName}" \
   ${sourceFile}
 
