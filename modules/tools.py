@@ -1,5 +1,8 @@
 import platform
+import re
 import sys
+import socket
+
 import modules.globalVariables as Var
 
 
@@ -36,3 +39,21 @@ def proxies_link() -> dict:
         return local_proxies
     elif "http" in Var.proxyLink[0:4]:
         return local_proxies
+
+
+class CheckLink:
+    # IP检查器
+    def check_ip(self: str):
+        try:
+            socket.inet_aton(self)
+            return True
+        except socket.error:
+            return False
+
+    # 检查普通URL格式
+    def check_url(self: str):
+        url_pattern = re.compile(r'^(http|https)://[a-zA-Z0-9-._~:/?#[\]@!$&\'()*+,;=]+')
+        if url_pattern.match(self):
+            return True
+        else:
+            return False

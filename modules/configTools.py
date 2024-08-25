@@ -1,19 +1,19 @@
 import json
 import os
-import re
-import socket
 import sys
+import json5
+import requests.exceptions
+import yaml
+
 try:
     import tomllib
 except ModuleNotFoundError:
     import tomli as tomllib
 
-import json5
-import requests.exceptions
-import yaml
 from colorama import Fore, Style
 
 import modules.globalVariables as Var
+from modules.tools import CheckLink
 
 
 class ConfigTools:
@@ -29,16 +29,16 @@ class ConfigTools:
         elif self == 'yaml':
             default_config_file = [file for file in import_list if file.endswith('.yaml')]
         else:
-            # 这个检查是绝对的小丑
+            # 这个是绝对的小丑
             default_config_file = None
             print(default_config_file)
-            sys.exit(Fore.RED + "[Wrong choice of default suffix parameter]" + Style.RESET_ALL)
+            sys.exit(Fore.RED + "[Unable to read configuration file]" + Style.RESET_ALL)
         return default_config_file
 
     # 配置文件内容检查
     def config_check(self: dict) -> None:
-        # General块检查
-        def general():
+        # 检查General
+        def general_check():
             # 类型检查
             if not isinstance(self["General"]["enable"], bool):
                 sys.exit(Fore.RED + "enable is the wrong variable type" + Style.RESET_ALL)
@@ -49,16 +49,16 @@ class ConfigTools:
             if not isinstance(self["General"]["ip"], str):
                 sys.exit(Fore.RED + "ip is the wrong variable type" + Style.RESET_ALL)
             if not isinstance(self["General"]["port"], int):
-                sys.exit(Fore.RED + "enable is the wrong variable type" + Style.RESET_ALL)
+                sys.exit(Fore.RED + "port is the wrong variable type" + Style.RESET_ALL)
+            if not isinstance(self["General"]["UpdatePublickeysTime"], int):
+                sys.exit(Fore.RED + "UpdatePublickeysTime is the wrong variable type" + Style.RESET_ALL)
+
             # 判断配置文件是否启用
             if not self["General"]["enable"]:
                 sys.exit(Fore.RED + "[CONFIG NOT ENABLE]" + Style.RESET_ALL)
-            # 检查IP地址格式是否正确
-            try:
-                socket.inet_aton(self["General"]["ip"])
-                pass
-            except socket.error:
-                sys.exit(Fore.RED + "[The IP address is incorrect]" + Style.RESET_ALL)
+            # 检查IP地址
+            if not CheckLink.check_ip(self["General"]["ip"]):
+                sys.exit(Fore.RED + "[IP address is incorrect]" + Style.RESET_ALL)
             # 检查debuglevel值是否在范围内
             debuglevel_value = (1, 2)
             if not self["General"]["debuglevel"] in debuglevel_value:
@@ -68,42 +68,29 @@ class ConfigTools:
                 sys.exit(Fore.RED + "port value is incorrect" + Style.RESET_ALL)
             pass
 
-        # 检查Server块
-        def server():
-            # 检查IP URL格式
-            def check_ip(ip):
-                try:
-                    socket.inet_aton(ip)
-                    return True
-                except socket.error:
-                    return False
-
-            # 检查普通URL格式
-            def check_url(url):
-                url_pattern = re.compile(r'^(http|https)://[a-zA-Z0-9-._~:/?#[\]@!$&\'()*+,;=]+')
-                if url_pattern.match(url):
-                    return True
-                else:
-                    return False
-
-            # 使用for循环检查多个服务器链接和格式
+        # 检查Server
+        def server_check():
+            # 检查服务器链接和格式
             for i in range(len(self["Server"])):
                 # 检查变量格式
                 if not isinstance(self["Server"][str(i)]["Name"], str):
                     sys.exit(Fore.RED + f"Name is the wrong variable type in Server.{i}" + Style.RESET_ALL)
                 if not isinstance(self["Server"][str(i)]["Url"], str):
                     sys.exit(Fore.RED + f"Url is the wrong variable type in Server.{i}" + Style.RESET_ALL)
+                if not isinstance(self["Server"][str(i)]["NeedProxy"], bool):
+                    sys.exit(Fore.RED + f"NeedProxy is the wrong variable type in Server.{i}" + Style.RESET_ALL)
+
                 # 执行网址检查
-                if check_ip(self["Server"][str(i)]["Url"]):
-                    pass
-                elif check_url(self["Server"][str(i)]["Url"]):
-                    pass
+                if CheckLink.check_ip(self["Server"][str(i)]["Url"]):
+                    continue
+                elif CheckLink.check_url(self["Server"][str(i)]["Url"]):
+                    continue
                 else:
                     sys.exit(Fore.RED + f"The Server.{i} URL is incorrect" + Style.RESET_ALL)
             pass
 
-        general()
-        server()
+        general_check()
+        server_check()
         pass
 
     # 打开配置文件
@@ -140,7 +127,7 @@ class ConfigTools:
 
 
 # 检查服务器是mojang官方还是第三方
-def official_judgment(url):
+def server_type_judgment(url):
     mojang_url = "sessionserver.mojang.com"
     blessing_url = "/api/yggdrasil"
     # 判断服务器类型

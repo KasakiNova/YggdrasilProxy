@@ -82,10 +82,10 @@ class ConfigParsing:
 
 # 加载Server块配置文件
 def read_server_config(config_serial: int):
-    from modules.configTools import official_judgment
+    from modules.configTools import server_type_judgment
     server_data = Var.configData["Server"]
     def_name = server_data[str(config_serial)]["Name"]
     def_proxy = server_data[str(config_serial)]["NeedProxy"]
     def_url = server_data[str(config_serial)]["Url"]
-    def_type = official_judgment(def_url)
+    def_type = server_type_judgment(def_url)
     return def_name, def_proxy, def_url, def_type
