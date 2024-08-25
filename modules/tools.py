@@ -24,9 +24,11 @@ def print_system_info() -> None:
 def proxies_link() -> dict:
     # 判断是否使用账户验证
     if Var.proxyAuthEnable:
+        protocol = Var.proxyLink.split("://")[0]
+        link = Var.proxyLink.split("://")[1]
         local_proxies = {
-            "http": f"{Var.proxyUsername}:{Var.proxyPassword}@{Var.proxyLink}",
-            "https": f"{Var.proxyUsername}:{Var.proxyPassword}@{Var.proxyLink}"
+            "http": f"{protocol}://{Var.proxyUsername}:{Var.proxyPassword}@{link}",
+            "https": f"{protocol}://{Var.proxyUsername}:{Var.proxyPassword}@{link}"
         }
     else:
         local_proxies = {

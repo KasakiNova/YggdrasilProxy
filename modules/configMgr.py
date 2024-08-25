@@ -1,8 +1,6 @@
 import os
-import sys
 
 import modules.globalVariables as Var
-
 from modules.configTools import ConfigTools, load_config_to_var
 
 
