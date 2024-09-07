@@ -12,7 +12,7 @@ class ConfigParsing:
         self.configFile = str()
         self.configFileList = set()
         self.selectExtension = import_config_extension
-        self.endswith = ('toml', 'json', 'json5', 'yaml')
+        self.endswith = ("toml", "json", "json5", "yaml")
 
     def check_config(self) -> bool:
         # 检查文件夹是否存在,不存在则创建
@@ -24,13 +24,17 @@ class ConfigParsing:
         # 不存在则创建默认配置文件并退出程序
         if len(os.listdir(self.configDir)) == 0:
             from modules.defaultConfig import create_config_file as def_config
+
             def_config(str(self.configDir + os.sep))
             return False
         else:
             config_list = set(os.listdir(self.configDir))
         # 检查static文件夹内index.json是否存在
-        if not os.path.exists(str(Var.workDir + os.sep + "static" + os.sep + "index.json")):
+        if not os.path.exists(
+            str(Var.workDir + os.sep + "static" + os.sep + "index.json")
+        ):
             from modules.defaultConfig import create_index_file as def_index
+
             def_index(str(Var.workDir + os.sep + "static" + os.sep))
         # 检查文件扩展名
         for filename in config_list:
@@ -40,11 +44,11 @@ class ConfigParsing:
             return False
         # 对配置文件列表进行排序
         # 0为toml，1为json，2为json5，3为yaml
-        suffix_order = {'.toml': 0, '.json': 1, 'json5': 2, 'yaml': 3}
+        suffix_order = {".toml": 0, ".json": 1, "json5": 2, "yaml": 3}
 
         def reordering(file):
-            _, ext = file.split('.')
-            return suffix_order.get('.' + ext, float('inf'))
+            _, ext = file.split(".")
+            return suffix_order.get("." + ext, float("inf"))
 
         self.configFileList = sorted(config_list, key=reordering)
         return True
@@ -52,7 +56,9 @@ class ConfigParsing:
     # 加载配置文件
     def load_config(self, import_config_file):
         # 选择默认扩展名
-        default_config_file = ConfigTools.select_extension(self.selectExtension, self.configFileList)
+        default_config_file = ConfigTools.select_extension(
+            self.selectExtension, self.configFileList
+        )
         # 检查输入参数是否为空，空则将默认配置文件覆盖进来
         if import_config_file is None:
             self.configFile = self.configDir + os.sep + default_config_file[0]
@@ -81,6 +87,7 @@ class ConfigParsing:
 # 加载Server块配置文件
 def read_server_config(config_serial: int):
     from modules.configTools import server_type_judgment
+
     server_data = Var.configData["Server"]
     def_name = server_data[str(config_serial)]["Name"]
     def_proxy = server_data[str(config_serial)]["NeedProxy"]

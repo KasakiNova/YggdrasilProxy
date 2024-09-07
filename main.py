@@ -14,7 +14,7 @@ from modules.configMgr import ConfigParsing
 from modules.httpLogic import app
 from modules.tools import print_system_info
 
-# 配置文件处理实例化
+# 配置文件处理初始化
 config = ConfigParsing(Var.ConfigPath, Var.ConfigExtension)
 # 输入参数的初始化
 # 未实现输入参数
@@ -30,15 +30,19 @@ print(f"Service running in {Var.workDir}")
 if config.check_config():
     (configList, configName, Var.configData) = config.load_config(opt_configFileName)
     print(f"Find {len(set(configList))} Configuration File")
-    print("The configuration file has been found. The file is", Fore.CYAN + configName + Style.RESET_ALL)
+    print(
+        "The configuration file has been found. The file is",
+        Fore.CYAN + configName + Style.RESET_ALL,
+    )
     # 依据debuglevel设定日志级别
-    if Var.debuglevel == 2:
-        print("General:\n", Var.configData['General'])
+    if Var.debugMode:
+        print("General:\n", Var.configData["General"])
         print("Proxy:\n", Var.configData["Proxy"])
-        print("Server:\n", Var.configData['Server'])
+        print("Server:\n", Var.configData["Server"])
     # 如Proxy启用则检查是否能够使用
     if Var.proxyEnable:
         from modules.configTools import check_proxy
+
         if not check_proxy():
             sys.exit("Proxy is incorrect")
     print(Fore.GREEN + "[Config Loaded]" + Style.RESET_ALL)
@@ -54,6 +58,11 @@ if __name__ == "__main__":
     logger = logging.getLogger("waitress")
     logger.setLevel(logging.INFO)
     try:
-        serve(TransLogger(app, setup_console_handler=False), host=Var.ip, port=Var.port, threads=4)
+        serve(
+            TransLogger(app, setup_console_handler=False),
+            host=Var.ip,
+            port=Var.port,
+            threads=4,
+        )
     except KeyboardInterrupt:
         print("\nStopped by user")

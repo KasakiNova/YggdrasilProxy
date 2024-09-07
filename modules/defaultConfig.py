@@ -5,11 +5,10 @@ default_config = """[General]
 enable=true
 # Save Logs
 # default: false
-logs=false
-# 1: info, 2: debug,
-# Console and logs use this
-# default: 1
-debuglevel=1
+save-log=false
+# false: info, true: debug,
+# default: false
+debug=true
 # Binding IP
 # default: "127.0.0.1"
 ip = "127.0.0.1"
@@ -18,6 +17,7 @@ ip = "127.0.0.1"
 port=30000
 # Publickeys Update time
 # Default: 7200
+# 0 is no check for updates
 UpdatePublickeysTime=7200
 
 [Proxy]
@@ -38,14 +38,16 @@ username=""
 password=""
 
 [Server.0]
-# Mojang Offical Server
+# Mojang Official Server
 Name="Mojang"
+ServerType="Official"
 NeedProxy=false
 Url="https://sessionserver.mojang.com"
 
 [Server.1]
 # LittleSkin Server
 Name="LittleSkin"
+ServerType="Blessing"
 NeedProxy=false
 Url="https://littleskin.cn/api/yggdrasil"
 """

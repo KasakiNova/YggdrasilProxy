@@ -18,23 +18,29 @@ def update_key_thread():
     pass
 
 
+def save_publickeys2folder(keys: dict, folder: str):
+
+    pass
+
+
+# 检查publickeys是否正确
+def check_publickey_structure(json_data):
+    try:
+        for key in json_data:
+            if key not in ["profilePropertyKeys", "playerCertificateKeys"]:
+                return False
+            if not isinstance(json_data[key], list):
+                return False
+            for item in json_data[key]:
+                if not isinstance(item, dict) or "publicKey" not in item:
+                    return False
+        return True
+    except json.JSONDecodeError:
+        return False
+
+
 # publickeys更新
 def update_publickeys():
-    # 检查publickeys是否正确的函数
-    def check_publickey_structure(json_data):
-        try:
-            for key in json_data:
-                if key not in ["profilePropertyKeys", "playerCertificateKeys"]:
-                    return False
-                if not isinstance(json_data[key], list):
-                    return False
-                for item in json_data[key]:
-                    if not isinstance(item, dict) or "publicKey" not in item:
-                        return False
-            return True
-        except json.JSONDecodeError:
-            return False
-
     # 获取publickeys
     # 如果无法从Mojang官方获取就从LittleSkin获取
     try:

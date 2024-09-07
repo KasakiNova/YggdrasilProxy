@@ -10,6 +10,7 @@ def request_tool(url, proxy):
         response = requests.get(url=url, proxies=proxies)
     else:
         response = requests.get(url=url)
+
     if not response.status_code == 200:
         return "Error"
     return response.json()
@@ -18,7 +19,9 @@ def request_tool(url, proxy):
 # Mojang正版验证
 def request_mojang_server(username, server_id, proxy):
     domain = "https://sessionserver.mojang.com"
-    url = f"{domain}/session/minecraft/hasJoined?username={username}&serverId={server_id}"
+    url = (
+        f"{domain}/session/minecraft/hasJoined?username={username}&serverId={server_id}"
+    )
     return request_tool(url, proxy)
 
 

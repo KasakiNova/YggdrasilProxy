@@ -3,6 +3,7 @@ json5
 PyYAML
 tomli; python_version<'3.11'
 Flask
+flask[async]
 requests
 waitress
 Paste

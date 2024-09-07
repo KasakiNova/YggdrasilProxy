@@ -1,7 +1,7 @@
 import platform
 import re
-import sys
 import socket
+import sys
 
 import modules.globalVariables as Var
 
@@ -10,11 +10,19 @@ import modules.globalVariables as Var
 def print_system_info() -> None:
     print()
     win32 = None
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         win32 = platform.win32_edition()
 
-    print(platform.system(), platform.version(), win32, platform.platform(), platform.machine(),
-          platform.architecture(), "\n", platform.processor())
+    print(
+        platform.system(),
+        platform.version(),
+        win32,
+        platform.platform(),
+        platform.machine(),
+        platform.architecture(),
+        "\n",
+        platform.processor(),
+    )
     print("Python Version", sys.version, "\n", sys.version_info)
     print()
     pass
@@ -28,19 +36,13 @@ def proxies_link() -> dict:
         link = Var.proxyLink.split("://")[1]
         local_proxies = {
             "http": f"{protocol}://{Var.proxyUsername}:{Var.proxyPassword}@{link}",
-            "https": f"{protocol}://{Var.proxyUsername}:{Var.proxyPassword}@{link}"
+            "https": f"{protocol}://{Var.proxyUsername}:{Var.proxyPassword}@{link}",
         }
     else:
-        local_proxies = {
-            "http": f"{Var.proxyLink}",
-            "https": f"{Var.proxyLink}"
-        }
+        local_proxies = {"http": f"{Var.proxyLink}", "https": f"{Var.proxyLink}"}
 
     # 检测协议
-    if "https" in Var.proxyLink[0:5]:
-        return local_proxies
-    elif "http" in Var.proxyLink[0:4]:
-        return local_proxies
+    return local_proxies
 
 
 class CheckLink:
@@ -54,7 +56,9 @@ class CheckLink:
 
     # 检查普通URL格式
     def check_url(self: str):
-        url_pattern = re.compile(r'^(http|https)://[a-zA-Z0-9-._~:/?#[\]@!$&\'()*+,;=]+')
+        url_pattern = re.compile(
+            r"^(http|https)://[a-zA-Z0-9-._~:/?#[\]@!$&\'()*+,;=]+"
+        )
         if url_pattern.match(self):
             return True
         else:
