@@ -1,7 +1,7 @@
 import json
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory, url_for
 
 import modules.globalVariables as Var
 
@@ -15,7 +15,7 @@ app = Flask(__name__)
 # 访问根返回值
 @app.get(rule="/")
 async def get_root():
-    path: str = f"{Var.workDir}{os.sep}static{os.sep}index.json"
+    path: str = f"{Var.workDir}{os.sep}webapp{os.sep}index.json"
     with open(path, mode="rb") as index:
         return jsonify(json.load(index))
 

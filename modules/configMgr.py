@@ -18,8 +18,8 @@ class ConfigParsing:
         # 检查文件夹是否存在,不存在则创建
         if not os.path.exists(self.configDir):
             os.mkdir(self.configDir)
-        if not os.path.exists(str(Var.workDir + os.sep + "static")):
-            os.mkdir(f"{Var.workDir}{os.sep}static")
+        if not os.path.exists(str(Var.workDir + os.sep + "webapp")):
+            os.mkdir(f"{Var.workDir}{os.sep}webapp")
         # 检查文件夹内是否存在配置文件
         # 不存在则创建默认配置文件并退出程序
         if len(os.listdir(self.configDir)) == 0:
@@ -31,11 +31,11 @@ class ConfigParsing:
             config_list = set(os.listdir(self.configDir))
         # 检查static文件夹内index.json是否存在
         if not os.path.exists(
-            str(Var.workDir + os.sep + "static" + os.sep + "index.json")
+            str(Var.workDir + os.sep + "webapp" + os.sep + "index.json")
         ):
             from modules.defaultConfig import create_index_file as def_index
 
-            def_index(str(Var.workDir + os.sep + "static" + os.sep))
+            def_index(str(Var.workDir + os.sep + "webapp" + os.sep))
         # 检查文件扩展名
         for filename in config_list:
             if filename.endswith(self.endswith):

@@ -54,6 +54,8 @@ thread = threading.Thread(target=update_key_thread)
 thread.daemon = True
 thread.start()
 
+# app.run(debug=True,port=30000)
+
 if __name__ == "__main__":
     logger = logging.getLogger("waitress")
     logger.setLevel(logging.INFO)

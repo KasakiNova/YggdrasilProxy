@@ -11,6 +11,5 @@ __pycache__
 logs
 
 # 文件
-static/publickeys.json
-static/index.json
+webapp/publickeys.json
 nuitka-crash-report.xml
