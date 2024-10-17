@@ -37,8 +37,8 @@ if config.check_config():
     # 依据debuglevel设定日志级别
     if Var.debugMode:
         print("General:\n", Var.configData["General"])
-        print("Proxy:\n", Var.configData["Proxy"])
-        print("Server:\n", Var.configData["Server"])
+        print("\nProxy:\n", Var.configData["Proxy"])
+        print("\nServer:\n", Var.configData["Server"])
     # 如Proxy启用则检查是否能够使用
     if Var.proxyEnable:
         from modules.configTools import check_proxy
@@ -53,6 +53,7 @@ else:
 thread = threading.Thread(target=update_key_thread)
 thread.daemon = True
 thread.start()
+time.sleep(0.1)
 
 # app.run(debug=True,port=30000)
 
@@ -64,7 +65,7 @@ if __name__ == "__main__":
             TransLogger(app, setup_console_handler=False),
             host=Var.ip,
             port=Var.port,
-            threads=4,
+            threads=6,
         )
     except KeyboardInterrupt:
         print("\nStopped by user")

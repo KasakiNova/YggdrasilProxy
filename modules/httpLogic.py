@@ -1,13 +1,12 @@
 import json
 import os
 
-from flask import Flask, jsonify, request, send_from_directory, url_for
+from flask import Flask, jsonify, request
 
 import modules.globalVariables as Var
-
-from modules.hasJoinedRequest import request_mojang_server, request_bs_server
 from modules.configMgr import read_server_config
 from modules.customError import FailureToFetchProfile
+from modules.hasJoinedRequest import request_mojang_server, request_bs_server
 
 app = Flask(__name__)
 
