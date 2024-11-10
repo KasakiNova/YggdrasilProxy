@@ -4,12 +4,14 @@ venv
 venv*
 venvs
 buildVenv
-configs
 build
 .idea
 __pycache__
-logs
+tests
+wslVenv
 
 # 文件
-webapp/publickeys.json
+web/publickeys.json
 nuitka-crash-report.xml
+test.py
+config.toml
