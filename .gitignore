@@ -9,6 +9,7 @@ build
 __pycache__
 tests
 wslVenv
+static
 
 # 文件
 web/publickeys.json
