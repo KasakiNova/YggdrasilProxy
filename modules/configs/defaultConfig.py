@@ -3,9 +3,6 @@ default_config = """[General]
 # Save Logs
 # default: false
 save-log=false
-# false: info, true: debug,
-# default: false
-debug=false
 # Binding IP
 # default: "127.0.0.1"
 ip = "127.0.0.1"
