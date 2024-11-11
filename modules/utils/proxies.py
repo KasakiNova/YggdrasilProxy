@@ -1,19 +1,38 @@
+import requests
+
 import modules.globalVariables as gVar
+from modules.Errors import ProxyError
+
 
 class Proxies:
     def __init__(self):
-        local_proxies = {}
+        self.__proxies = {}
         proxy_settings = gVar.cfgContext['Proxy']
         if proxy_settings['enable']:
             # If enable auth
             if proxy_settings['enable_auth']:
                 protocol = proxy_settings['address'].split("://")[0]
                 link = proxy_settings['address'].split("://")[1]
-                local_proxies = {
+                self.__proxies = {
                     "http": f"{protocol}://{proxy_settings['username']}:{proxy_settings['password']}@{link}",
                     "https": f"{protocol}://{proxy_settings['username']}:{proxy_settings['password']}@{link}",
                 }
-            # no auth
+            # this is no auths proxies
             else:
-                local_proxies = {"http": f"{proxy_settings['address']}", "https": f"{proxy_settings['address']}"}
-        gVar.proxies = local_proxies
+                self.__proxies = {
+                    "http": f"{proxy_settings['address']}",
+                    "https": f"{proxy_settings['address']}"
+                }
+        gVar.proxies = self.__proxies
+
+    def check_proxies(self, url = "https://api.myip.la"):
+        try:
+            response = requests.get(url=url, proxies=self.__proxies)
+            if response.status_code == 200:
+                return True
+            else:
+                raise ProxyError
+        except requests.exceptions.ProxyError:
+            return False
+        except ProxyError:
+            return False

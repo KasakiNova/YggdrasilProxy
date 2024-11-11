@@ -1,4 +1,6 @@
 # If Python Version is Lower than 3.11, this well be import tomli to change tomllib
+import sys
+
 try:
     import tomllib
 except ImportError:
@@ -10,7 +12,7 @@ from print_color import print
 
 import modules.globalVariables as gVar
 from modules.configs.defaultConfig import create_config_file
-
+from modules.configs.configChecker import validate_config
 
 class Config:
     def __init__(self):
@@ -42,8 +44,12 @@ class Config:
     def read(self) -> dict:
         with open(self._fileName, 'rb') as fff:
             f = tomllib.load(fff)
-            if f["General"]["debug"] :
-                gVar.debugMode = f["General"]["debug"]
-                print(f)
+            if not validate_config(f):
+                sys.exit("[Config File is incorrect]")
+            try:
+                if f["General"]["debug"] :
+                    gVar.debugMode = True
+            except KeyError:
+                gVar.debugMode = False
             return f
 

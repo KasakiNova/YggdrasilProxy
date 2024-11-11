@@ -34,7 +34,7 @@ password=""
 # Auth Servers
 # ServerType:
 # Mojang: Mojang Official Auth Server
-# Blessing: Blessing Skin Server Yggdrasil
+# Blessing: Blessing Skin Server Yggdrasil API
 [Server.0]
 # Mojang Official Server
 Name="Mojang"

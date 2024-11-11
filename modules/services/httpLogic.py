@@ -7,7 +7,7 @@ import modules.globalVariables as gVar
 from modules.services.hasJoinedService import HasJoinedService
 
 app = Flask(__name__)
-
+has_joined_service = HasJoinedService()
 
 # Return index.json
 @app.route(rule='/', methods=['GET'])
@@ -23,9 +23,10 @@ def publickeys():
 
 @app.route(rule='/sessionserver/session/minecraft/hasJoined', methods=['GET'])
 def has_joined():
-    has_joined_service = HasJoinedService()
+    # Get URL Params
     server_id = request.args.get("serverId")
     username = request.args.get("username")
+    # Send username and serverId to get user profile
     profile = has_joined_service.get_profile(username=username, server_id=server_id)
     return jsonify(profile)
 

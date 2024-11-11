@@ -24,7 +24,7 @@ if cfg.init():
     gVar.cfgContext = cfg.read()
     print(Fore.GREEN + "[Config File Loaded]" + Style.RESET_ALL)
 else:
-    sys.exit(Fore.RED + "Please check your config and try again." + Style.RESET_ALL)
+    sys.exit(Fore.RED + "[Please check your config and try again]" + Style.RESET_ALL)
 
 # Init PublicKeys Class and Services
 publickeys = PublicKeys()
@@ -32,16 +32,28 @@ publickeys.start_thread()
 
 # Init Proxies
 proxies = Proxies()
+if gVar.proxies != {}:
+    if not proxies.check_proxies():
+        sys.exit(Fore.RED + "[Proxy is incorrect]" + Style.RESET_ALL)
 
 # Init WebApp
 webapp = WebApp()
+
+# if debugMode is enable
+if gVar.debugMode:
+    print("Config: \n", gVar.cfgContext)
+    if gVar.cfgContext['Proxy']['enable']:
+        print("ProxiesLink: \n", gVar.proxies)
+
+
 from modules.services.httpLogic import app
 if __name__ == '__main__':
     if gVar.debugMode:
         app.run(host=gVar.cfgContext["General"]["ip"],
                 port=gVar.cfgContext["General"]["port"],
                 debug=True,
-                threaded=True)
+                threaded=True
+        )
     else:
         logger = logging.getLogger("waitress")
         logger.setLevel(logging.INFO)

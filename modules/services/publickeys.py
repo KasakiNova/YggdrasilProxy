@@ -33,14 +33,19 @@ class PublicKeys:
                 pass
 
     def start_thread(self):
-        thread = threading.Thread(target=self.thread)
-        thread.daemon = True
-        thread.start()
-        print("[Update PublicKeys Services Loaded]", color='green')
+        if self.__check_time == 0:
+            self.get_key()
+            gVar.publickey = self.__keys
+            self.write_json_to_file()
+            print("[PublicKeys Loaded]", color='green')
+        else:
+            thread = threading.Thread(target=self.thread)
+            thread.daemon = True
+            thread.start()
+            print("[Update PublicKeys Services Loaded]", color='green')
 
     def thread(self):
         self.get_key()
-        self.write_json_to_file()
         while True:
             self.get_key()
             if self.__keys != gVar.publickey:
