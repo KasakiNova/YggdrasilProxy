@@ -16,3 +16,6 @@ web/publickeys.json
 nuitka-crash-report.xml
 test.py
 config.toml
+
+build.ps1
+build.sh
