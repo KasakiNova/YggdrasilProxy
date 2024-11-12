@@ -2,9 +2,12 @@ import json
 import os.path
 
 from flask import Flask, jsonify, request
+from werkzeug.serving import WSGIRequestHandler
 
 import modules.globalVariables as gVar
 from modules.services.hasJoinedService import HasJoinedService
+
+WSGIRequestHandler.server_version = "YggdrasilProxyServer"
 
 app = Flask(__name__)
 has_joined_service = HasJoinedService()

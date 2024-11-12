@@ -3,8 +3,8 @@ import sys
 from time import sleep
 
 from colorama import Fore, Style
-from waitress import serve
 from paste.translogger import TransLogger
+from waitress import serve
 
 import modules.globalVariables as gVar
 from modules.configs.config import Config
@@ -26,10 +26,6 @@ if cfg.init():
 else:
     sys.exit(Fore.RED + "[Please check your config and try again]" + Style.RESET_ALL)
 
-# Init PublicKeys Class and Services
-publickeys = PublicKeys()
-publickeys.start_thread()
-
 # Init Proxies
 proxies = Proxies()
 if gVar.proxies != {}:
@@ -38,6 +34,10 @@ if gVar.proxies != {}:
 
 # Init WebApp
 webapp = WebApp()
+
+# Init PublicKeys Class and Services
+publickeys = PublicKeys()
+publickeys.start_thread()
 
 # if debugMode is enable
 if gVar.debugMode:
@@ -63,6 +63,7 @@ if __name__ == '__main__':
                 host=gVar.cfgContext["General"]["ip"],
                 port=gVar.cfgContext["General"]["port"],
                 threads=10,
+                ident= "YggdrasilProxyServer"
             )
         except KeyboardInterrupt:
             print("\nStopped by user")

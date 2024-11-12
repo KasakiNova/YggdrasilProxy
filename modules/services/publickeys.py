@@ -17,32 +17,41 @@ class PublicKeys:
         self.__staticDir = gVar.webDir
         self.__keyFile = os.path.join(self.__staticDir, 'publickeys.json')
         self.__check_time = gVar.cfgContext["General"]["CheckKeysTime"]
+        self.__proxy_enable = gVar.cfgContext["Proxy"]["enable"]
+        self.__proxies = gVar.proxies
         # If publickeys.json does not exist, so create it
-        if not os.path.isfile(self.__keyFile):
-            with open(self.__keyFile, 'w') as keyFile:
-                keyFile.write(self.__keyFile)
+        try:
+            if not os.path.isfile(self.__keyFile):
+                with open(self.__keyFile, 'w'):
+                    pass
                 pass
-            pass
-        else:
-            try:
+            else:
                 with open(self.__keyFile, 'r') as keyFile:
                     self.__keys = json.loads(keyFile.read())
                     pass
                 gVar.publickey = self.__keys
-            except JSONDecodeError:
-                pass
+        except JSONDecodeError:
+            pass
+        except FileNotFoundError:
+            pass
 
     def start_thread(self):
-        if self.__check_time == 0:
+        if os.path.getsize(self.__keyFile) == 0:
             self.get_key()
             gVar.publickey = self.__keys
             self.write_json_to_file()
-            print("[PublicKeys Loaded]", color='green')
         else:
+            if not self.check_key():
+                self.get_key()
+                gVar.publickey = self.__keys
+                self.write_json_to_file()
+        if not self.__check_time == 0:
             thread = threading.Thread(target=self.thread)
             thread.daemon = True
             thread.start()
             print("[Update PublicKeys Services Loaded]", color='green')
+        else:
+            print("[PublicKeys Loaded]", color='green')
 
     def thread(self):
         self.get_key()
@@ -63,7 +72,7 @@ class PublicKeys:
         mojang_server = "https://api.minecraftservices.com/publickeys"
         little_skin = "https://littleskin.cn/api/yggdrasil/minecraftservices/publickeys"
         try:
-            response = requests.get(mojang_server)
+            response = self.request(mojang_server)
             if response.status_code == 200:
                 self.__keys = response.json()
                 if self.check_key():
@@ -74,7 +83,7 @@ class PublicKeys:
                 raise ErrorInGettingPublickeysFromMojang("Unable to get publickeys from mojang server")
         except ErrorInGettingPublickeysFromMojang as e:
             print(str(e), color='red')
-            response = requests.get(little_skin)
+            response = self.request(little_skin)
             if response.status_code == 200:
                 self.__keys = response.json()
                 if self.check_key():
@@ -101,3 +110,13 @@ class PublicKeys:
             return True
         except json.JSONDecodeError:
             return False
+
+    def request(self, url):
+            try:
+                if self.__proxy_enable:
+                    print()
+                    return requests.get(url, self.__proxies)
+                else:
+                    return requests.get(url)
+            except requests.exceptions.RequestException:
+                pass

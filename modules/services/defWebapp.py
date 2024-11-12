@@ -10,7 +10,6 @@ def create_index_file(path: str):
         }
     }"""
     filename = os.path.join(path, "index.json")
-    print(filename)
     with open(filename, 'w') as configfile:
         configfile.write(default_index)
 
