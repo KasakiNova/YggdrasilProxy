@@ -58,6 +58,7 @@ if __name__ == '__main__':
         logger = logging.getLogger("waitress")
         logger.setLevel(logging.INFO)
         try:
+            # Try to start server
             serve(
                 TransLogger(app, setup_console_handler=False),
                 host=gVar.cfgContext["General"]["ip"],
@@ -67,3 +68,13 @@ if __name__ == '__main__':
             )
         except KeyboardInterrupt:
             print("\nStopped by user")
+        except PermissionError as e:
+            # This error for windows Port is in use
+            if e.winerror == 10013:
+                print(f"Error: Port {gVar.cfgContext['General']['port']} is already in use.")
+            print(f"Permission Error: {e}")
+        except OSError as e:
+            # This error maybe for unix system, like Linux or macOS
+            if e.errno == 98: # Error code 98 is port already use
+                print(f"Error: Port {gVar.cfgContext['General']['port']} is already in use.")
+            print(f"Permission Error: {e}")
