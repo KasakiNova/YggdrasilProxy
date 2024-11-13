@@ -6,7 +6,6 @@ waitress
 colorama
 print_color
 paste
-tomli
 Werkzeug
 pip
 MarkupSafe
@@ -22,3 +21,4 @@ idna
 charset-normalizer
 pytest
 packaging
+ujson
