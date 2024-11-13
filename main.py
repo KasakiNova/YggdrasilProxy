@@ -69,8 +69,8 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print("\nStopped by user")
         except PermissionError as e:
-            # This error for windows Port is in use
-            if e.winerror == 10013:
+            # Maybe for Windows
+            if e.winerror == 10013: # This error for windows Port is in use
                 print(f"Error: Port {gVar.cfgContext['General']['port']} is already in use.")
             print(f"Permission Error: {e}")
         except OSError as e:
