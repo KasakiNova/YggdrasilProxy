@@ -64,7 +64,9 @@ if __name__ == '__main__':
                 host=gVar.cfgContext["General"]["ip"],
                 port=gVar.cfgContext["General"]["port"],
                 threads=10,
-                ident= "YggdrasilProxyServer"
+                ident= "YggdrasilProxyServer",
+                channel_timeout=20,
+                max_request_body_size=10 * 1024 * 1024
             )
         except KeyboardInterrupt:
             print("\nStopped by user")
