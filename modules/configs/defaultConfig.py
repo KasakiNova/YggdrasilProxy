@@ -3,33 +3,44 @@ default_config = """[General]
 # Save Logs
 # default: false
 save-log=false
+
 # Binding IP
 # default: "127.0.0.1"
 ip = "127.0.0.1"
+
 # Service listening port
 # default: 30000
 port=30000
+
 # Check Publickeys time
 # Default: 7200
 # 0 is no check for updates
 CheckKeysTime=7200
 
+# Enable BlackList
+blackListEnable=false
+
 [Proxy]
 # Enable Proxy
 # Default: false
 enable=false
+
 # Proxy Address
 # Protocol input required
 # Examples: address="http://127.0.0.1:8080"
 # Supported Protocols: http, https
 address="127.0.0.1:8080"
+
 # Enable Auth
 # Default: false
 enable_auth=false
+
 # Proxy Auth Username
 username=""
+
 # Proxy Auth Password
 password=""
+
 
 # Auth Servers
 # ServerType:
