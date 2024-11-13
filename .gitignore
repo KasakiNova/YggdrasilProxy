@@ -10,7 +10,7 @@ __pycache__
 tests
 wslVenv
 static
-
+Test
 # 文件
 web/publickeys.json
 nuitka-crash-report.xml
