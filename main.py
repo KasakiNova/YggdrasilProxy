@@ -9,8 +9,10 @@ import modules.globalVariables as gVar
 from modules.configs.config import Config
 from modules.services.defWebapp import WebApp
 from modules.services.publickeys import PublicKeys
+from modules.services.blacklistService import BlacklistService
 from modules.utils.proxies import Proxies
 from modules.utils.sysinfo import sysinfo
+
 
 def initialize_config() -> None:
     """Init Config"""
@@ -22,20 +24,24 @@ def initialize_config() -> None:
     else:
         sys.exit(Fore.RED + "[Please check your config and try again]" + Style.RESET_ALL)
 
-def initialize_proxies() -> None:
-    """Init Proxies Link"""
+
+def initialize_services() -> None:
+    """Init WebApp and PublicKeys"""
+    # setup static dir and index.json
+    WebApp()
+    # try to init publickeys
+    publickeys = PublicKeys()
+    publickeys.start_thread()
+    # init blacklist service
+    blacklist = BlacklistService('blacklist.json')
+    # blacklist.add_blacklist_by_name("wdsda")
+    # Init Proxies Link
     proxies = Proxies()
     if gVar.proxies and not proxies.check_proxies():
         sys.exit(Fore.RED + "[Proxy is incorrect]" + Style.RESET_ALL)
 
-def initialize_services() -> None:
-    """Init WebApp and PublicKeys"""
-    WebApp()
 
-    publickeys = PublicKeys()
-    publickeys.start_thread()
-
-def start_waitress() -> None:
+def start_waitress(thread=10) -> None:
     """Start server with waitress"""
     from modules.services.httpLogic import app
     # Set waitress log level
@@ -46,7 +52,7 @@ def start_waitress() -> None:
             TransLogger(app, setup_console_handler=False),
             host=gVar.cfgContext["General"]["ip"],
             port=gVar.cfgContext["General"]["port"],
-            threads=10,
+            threads=thread,
             ident="YggdrasilProxyServer",
             channel_timeout=20,
             max_request_body_size=10 * 1024 * 1024
@@ -64,14 +70,14 @@ def start_waitress() -> None:
             print(f"Error: Port {gVar.cfgContext['General']['port']} is already in use.")
         print(f"OS Error: {e}")
 
+
 def main() -> None:
     """Main Service"""
     # print System info
     sysinfo()
 
-    # init config, proxies and some services
+    # init config and services
     initialize_config()
-    initialize_proxies()
     initialize_services()
 
     # If debugMode is true, print all config
@@ -79,9 +85,7 @@ def main() -> None:
         print("Config: \n", gVar.cfgContext)
         if gVar.cfgContext['Proxy']['enable']:
             print("ProxiesLink: \n", gVar.proxies)
-
     # Start Server
-    if gVar.debugMode:
         from modules.services.httpLogic import app
         app.run(host=gVar.cfgContext["General"]["ip"],
                 port=gVar.cfgContext["General"]["port"],
@@ -90,6 +94,7 @@ def main() -> None:
                 )
     else:
         start_waitress()
+
 
 if __name__ == '__main__':
     main()
