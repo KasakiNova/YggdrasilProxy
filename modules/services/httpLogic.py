@@ -2,8 +2,9 @@ import json
 import os.path
 
 import ujson
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask.json.provider import JSONProvider
+from werkzeug.http import HTTP_STATUS_CODES
 
 import modules.globalVariables as gVar
 from modules.services.hasJoinedService import HasJoinedService
@@ -47,4 +48,5 @@ def has_joined():
     username = request.args.get("username")
     # Send username and serverId to get user profile
     profile = has_joined_service.get_profile(username=username, server_id=server_id)
-    return jsonify(profile)
+    return Response(status=204) if profile is None else (jsonify(profile), 200)
+
