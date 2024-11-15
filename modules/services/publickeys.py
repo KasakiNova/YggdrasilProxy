@@ -35,7 +35,9 @@ class PublicKeys:
         except FileNotFoundError:
             pass
 
+
     def start_thread(self):
+        """Try to start auto check publickeys"""
         if os.path.getsize(self.__keyFile) == 0:
             self.get_key()
             gVar.publickey = self.__keys
@@ -45,15 +47,18 @@ class PublicKeys:
                 self.get_key()
                 gVar.publickey = self.__keys
                 self.write_json_to_file()
+        # check_time is 0 just running one time
         if not self.__check_time == 0:
             thread = threading.Thread(target=self.thread)
             thread.daemon = True
             thread.start()
-            print("[Update PublicKeys Services Loaded]", color='green')
+            print("Update PublicKeys Services Loaded", tag='Success', tag_color='green', color='white')
         else:
-            print("[PublicKeys Loaded]", color='green')
+            print("PublicKeys Loaded", tag='Success', tag_color='green', color='white')
+
 
     def thread(self):
+        """Use while to Cycle Check"""
         self.get_key()
         while True:
             self.get_key()
@@ -62,9 +67,12 @@ class PublicKeys:
                 self.write_json_to_file()
             sleep(self.__check_time)
 
+
     def write_json_to_file(self):
+        """Write publickeys to file"""
         with open(self.__keyFile, 'w') as file:
             file.write(json.dumps(self.__keys, indent=4, ensure_ascii=False))
+
 
     # Get the public key from the mojang server or LittleSkin
     # If you cannot get the public key from the mojang server, get it from the LittleSkin server
@@ -96,6 +104,7 @@ class PublicKeys:
             print(e)
         pass
 
+
     # Check whether the obtained publickeys is correct
     def check_key(self) -> bool:
         try:
@@ -110,6 +119,7 @@ class PublicKeys:
             return True
         except json.JSONDecodeError:
             return False
+
 
     def request(self, url):
             try:
