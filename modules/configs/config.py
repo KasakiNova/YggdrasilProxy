@@ -45,7 +45,7 @@ class Config:
         with open(self._fileName, 'rb') as fff:
             f = tomllib.load(fff)
             if not validate_config(f):
-                sys.exit("[Config File is incorrect]")
+                sys.exit("Config File is incorrect")
             try:
                 if f["General"]["debug"] :
                     gVar.debugMode = True
