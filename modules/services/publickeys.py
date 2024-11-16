@@ -10,6 +10,8 @@ from print_color import print
 import modules.globalVariables as gVar
 from modules.Errors import ErrorInGettingPublickeysFromMojang, ErrorInGettingPublickeysFromLittleSkin
 
+session = requests.Session()
+session.trust_env = False
 
 class PublicKeys:
     def __init__(self):
@@ -60,6 +62,7 @@ class PublicKeys:
     def thread(self):
         """Use while to Cycle Check"""
         self.get_key()
+        sleep(5)
         while True:
             self.get_key()
             if self.__keys != gVar.publickey:
