@@ -2,19 +2,18 @@ import logging
 import sys
 import threading
 from time import sleep
-from print_color import print
+
 from paste.translogger import TransLogger
+from print_color import print
 from waitress import serve
 
 import modules.globalVariables as gVar
 from modules.configs.config import Config
+from modules.console.mainConsole import MainConsole
 from modules.services.defWebapp import WebApp
 from modules.services.publickeys import PublicKeys
-from modules.services.blacklistService import BlacklistService
-from modules.database.accountInfoDB import AccountInfoDB
 from modules.utils.proxies import Proxies
 from modules.utils.sysinfo import sysinfo
-from modules.console.mainConsole import MainConsole
 
 
 def initialize_config() -> None:
@@ -117,4 +116,8 @@ def main() -> None:
     MainConsole().cmdloop()
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nShutting down...")
+        print("Bye~")
