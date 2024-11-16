@@ -11,6 +11,7 @@ from modules.configs.config import Config
 from modules.services.defWebapp import WebApp
 from modules.services.publickeys import PublicKeys
 from modules.services.blacklistService import BlacklistService
+from modules.database.accountInfoDB import AccountInfoDB
 from modules.utils.proxies import Proxies
 from modules.utils.sysinfo import sysinfo
 from modules.console.mainConsole import MainConsole
@@ -112,7 +113,7 @@ def main() -> None:
     http_thread.start()
 
     # Running Console
-    sleep(0.3)
+    sleep(0.5)
     MainConsole().cmdloop()
 
 if __name__ == '__main__':
