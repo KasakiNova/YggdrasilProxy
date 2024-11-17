@@ -34,9 +34,7 @@ def initialize_services() -> None:
     # try to init publickeys
     publickeys = PublicKeys()
     publickeys.start_thread()
-    # init blacklist service
-    # blacklist = BlacklistService('blacklist.json')
-    # blacklist.add_user_by_name("wdsda")
+
     # Init Proxies Link
     proxies = Proxies()
     if gVar.proxies and not proxies.check_proxies():

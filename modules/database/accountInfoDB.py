@@ -67,11 +67,11 @@ class AccountInfoDB:
         return result[0] if result else None
 
 
-    def get_baned_by_uuid(self, uuid):
-        """Query ban by UUID"""
+    def get_baned_by_uuid(self, uuid, server):
+        """Query ban by UUID and ServerId"""
         cursor = self._get_cursor()
-        sql = "SELECT baned FROM accounts WHERE uuid = ?"
-        cursor.execute(sql, uuid)
+        sql = "SELECT baned FROM accounts WHERE uuid = ? AND server = ?"
+        cursor.execute(sql, (uuid, server))
         result = cursor.fetchone()
         return bool(result[0]) if result else None
 

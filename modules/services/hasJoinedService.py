@@ -5,8 +5,8 @@ import requests
 
 import modules.globalVariables as gVar
 from modules.Errors import FailureToFetchProfile
+from modules.services.blacklistService import BlacklistService
 from modules.database.accountInfoDB import AccountInfoDB
-
 
 session = requests.Session()
 session.trust_env = False
@@ -23,6 +23,7 @@ class HasJoinedService:
         self.__server_id = ""
         self.__proxyEnable = gVar.cfgContext['Proxy']['enable']
         self.__proxies = gVar.proxies
+        self.blacklist = BlacklistService()
         self.account_db = AccountInfoDB()
 
     def get_profile(self, username: str, server_id: str):
@@ -34,12 +35,15 @@ class HasJoinedService:
             # If ServerType is about mojang or official, running this
             if serial['ServerType'].lower() in {"mojang", "official"}:
                 try:
-                    msg = self.request_mojang(serial['NeedProxy'])
+                    msg: MsgType = self.request_mojang(serial['NeedProxy'])
                     if msg['status']:
                         print(f"Successfully fetched player {username} in {serial['Name']} server")
                         # If debugMode is enabled, print the return value to the console
                         if gVar.debugMode:
                             print(msg['data'])
+
+                        if self.blacklist.check_is_blacklisted(msg['data']['id'],dict_server_id):
+                            return None
                         # When msg['data'] retrieves the data, input name,uuid, and the server ID
                         # from the configuration file into this function
                         # and attempt to add this account to the database.
@@ -58,13 +62,16 @@ class HasJoinedService:
             # this is about use blessing skin server, if
             elif serial['ServerType'].lower() in {"blessing"}:
                 try:
-                    msg = self.request_blessing(serial['Url'], serial['NeedProxy'])
+                    msg: MsgType = self.request_blessing(serial['Url'], serial['NeedProxy'])
                     # Check status in msg, if this is true check debugMode and return data in msg
                     if msg['status']:
                         print(f"Successfully fetched player {username} in {serial['Name']} server")
                         # If debugMode is enabled, print the return value to the console
                         if gVar.debugMode:
                             print(msg['data'])
+
+                        if self.blacklist.check_is_blacklisted(msg['data']['id'], dict_server_id):
+                            return None
                         self.try_to_add_account_to_db_thread(
                             msg['data']['name'],
                             msg['data']['id'],
@@ -109,6 +116,9 @@ class HasJoinedService:
         url = f"{i_url}/sessionserver/session/minecraft/hasJoined?username={self.__username}&serverId={self.__server_id}"
         return self.request_tool(url, proxy)
 
+
+    def check_profile(self, data_dict):
+        pass
 
     def try_to_add_account_to_db_thread(self, name, uuid, server):
         """Try to add account to accountDB thread"""
