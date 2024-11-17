@@ -4,7 +4,7 @@ from typing import TypedDict
 import requests
 
 import modules.globalVariables as gVar
-from modules.Errors import FailureToFetchProfile
+from modules.Errors import FailureToFetchProfile, PlayerIsBaned
 from modules.database.accountInfoDB import AccountInfoDB
 from modules.services.blacklistService import BlacklistService
 
@@ -37,34 +37,43 @@ class HasJoinedService:
             if serial['ServerType'].lower() in {"mojang", "official"}:
                 try:
                     msg: MsgType = self.request_mojang(serial['NeedProxy'])
+                    if msg['status'] is False:
+                        raise FailureToFetchProfile(
+                            f"Unable to get {username} profile from {serial['Name']} server")
                     player_baned = self.check_profile(msg, dict_server_id)
                     if player_baned:
                         print(f"Successfully fetched player {self.__username} in {serial['Name']} server")
                         return msg['data']
                     else:
                         if player_baned:
-                            raise FailureToFetchProfile(
-                                f"Player {username} has baned"
-                            )
-                        else:
                             # If the user data cannot be obtained from Mojang servers, an exception is raised
                             raise FailureToFetchProfile(
                                 f"Unable to get {username} profile from {serial['Name']} server")
+                        else:
+                            raise PlayerIsBaned(
+                                f"Player {username} has baned"
+                            )
                 except FailureToFetchProfile as e:
                     print(e)
                     continue
+                except PlayerIsBaned as e:
+                    print(e)
+                    return None
             # this is about use blessing skin server, if
             elif serial['ServerType'].lower() in {"blessing"}:
                 try:
                     msg: MsgType = self.request_blessing(serial['Url'], serial['NeedProxy'])
+                    if msg['status'] is False:
+                        raise FailureToFetchProfile(
+                            f"Unable to get {username} profile from {serial['Name']} server")
                     player_baned = self.check_profile(msg, dict_server_id)
                     # Check status in msg, if this is true check debugMode and return data in msg
                     if player_baned:
                         print(f"Successfully fetched player {self.__username} in {serial['Name']} server")
                         return msg['data']
                     else:
-                        if player_baned:
-                            raise FailureToFetchProfile(
+                        if not player_baned:
+                            raise PlayerIsBaned(
                                 f"Player {username} has baned"
                             )
                         else:
@@ -74,6 +83,9 @@ class HasJoinedService:
                 except FailureToFetchProfile as e:
                     print(e)
                     continue
+                except PlayerIsBaned as e:
+                    print(e)
+                    return None
         # if all server cannot find player profile
         print(f"Unable to get player {username} profile from All server")
         return None
@@ -87,6 +99,8 @@ class HasJoinedService:
             # If debugMode is enabled, print the return value to the console
             if gVar.debugMode:
                 print(msg['data'])
+            if self.account_db.check_uuid_exists(msg['data']['id'], server_id):
+                return True
             # When the player is banned in the list, it returns false directly
             if self.blacklist.check_is_blacklisted(msg['data']['id'], server_id):
                 return False
@@ -99,6 +113,8 @@ class HasJoinedService:
                 server_id
             )
             return True
+        else:
+            return False
 
 
     # request_tool use to requests.get, but support proxy

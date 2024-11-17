@@ -87,7 +87,7 @@ class AccountInfoDB:
     def check_uuid_exists(self, user_uuid, server_id):
         """Check if a user with the given UUID exists in the database"""
         cursor = self._get_cursor()
-        sql = "SELECT 1 FROM accounts WHERE uuid = ? AND server = ? LIMIT 1"
+        sql = "SELECT * FROM accounts WHERE uuid = ? AND server = ? LIMIT 1"
         cursor.execute(sql, (user_uuid, server_id))
         return cursor.fetchone() is not None
 
