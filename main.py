@@ -43,7 +43,7 @@ def initialize_services() -> None:
 
 def start_waitress(thread=10) -> None:
     """Start server with waitress"""
-    from modules.services.httpLogic import app
+    from modules.webapp.httpLogic import app
     # Set waitress log level
     logger = logging.getLogger("waitress")
     logger.setLevel(logging.INFO)
@@ -71,7 +71,7 @@ def start_waitress(thread=10) -> None:
 
 # Don't use other WSGI server, just use flask
 def start_flask_app() -> None:
-    from modules.services.httpLogic import app
+    from modules.webapp.httpLogic import app
     app.run(host=gVar.cfgContext["General"]["ip"],
             port=gVar.cfgContext["General"]["port"],
             debug=gVar.debugMode,
