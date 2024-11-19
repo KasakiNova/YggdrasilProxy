@@ -1,3 +1,4 @@
+# coding=utf-8
 from modules.database.accountInfoDB import AccountInfoDB
 
 class BlacklistService:

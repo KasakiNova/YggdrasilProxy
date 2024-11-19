@@ -1,3 +1,4 @@
+# coding=utf-8
 import sqlite3
 import threading
 import modules.globalVariables as gVar

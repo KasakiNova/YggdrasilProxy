@@ -1,3 +1,4 @@
+# coding=utf-8
 # This is default config.toml context
 default_config = """[General]
 # Save Logs

@@ -1,3 +1,4 @@
+# coding=utf-8
 # If Python Version is Lower than 3.11, this well be import tomli to change tomllib
 import sys
 

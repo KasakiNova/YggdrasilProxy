@@ -1,3 +1,4 @@
+# coding=utf-8
 class ErrorInGettingPublickeysFromMojang(Exception):
     def __init__(self, error_info):
         super().__init__(self)
