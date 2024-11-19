@@ -1,7 +1,6 @@
 import logging
 import sys
 import threading
-from asyncio import Server
 from time import sleep
 
 from paste.translogger import TransLogger
