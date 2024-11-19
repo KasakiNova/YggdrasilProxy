@@ -4,7 +4,6 @@ import os.path
 import ujson
 from flask import Flask, jsonify, request, Response
 from flask.json.provider import JSONProvider
-from werkzeug.http import HTTP_STATUS_CODES
 
 import modules.globalVariables as gVar
 from modules.services.hasJoinedService import HasJoinedService
