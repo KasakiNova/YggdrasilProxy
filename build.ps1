@@ -1,30 +1,56 @@
-$version="snapshots"
-$outputFileName="YggdrasilProxy-${version}"
-$outputPath="build"
-$sourceFile="main.py"
-$systemThread=$(Get-WmiObject Win32_ComputerSystem | Select-Object -ExpandProperty NumberOfLogicalProcessors)
-$pypiLink="https://pypi.python.org/simple"
+param (
+    [string]$version = "snapshots",
+    [string]$sourceFile = "main.py"
+)
+
+$outputFileName = "YggdrasilProxy-${version}"
+$outputPath = "build"
+$systemThread = (Get-WmiObject Win32_ComputerSystem | Select-Object -ExpandProperty NumberOfLogicalProcessors)
+$pypiLink = "https://pypi.python.org/simple"
 #$pypiLink="https://pypi.mirrors.ustc.edu.cn/simple"
 
-Remove-Item -Recurse -Path $outputPath -Force
+function New-VirtualEnvironment {
+    Write-Output "Creating Python virtual environment..."
+    if (-Not (Test-Path -Path buildVenv -PathType Container)) {
+        python.exe -m venv .venv
+    }
+}
+
+function Install-Packages {
+    Write-Output "Installing packages..."
+    .\.venv\Scripts\Activate.ps1
+    python.exe -m pip install --upgrade pip -i ${pypiLink}
+    pip install --no-cache-dir -r requirements.txt -i ${pypiLink}
+    pip install --no-cache-dir nuitka -i ${pypiLink}
+}
+
+function Invoke-ProjectBuild {
+    Write-Output "Building project now..."
+    python -OO -m nuitka `
+        --follow-imports `
+        --standalone `
+        --onefile `
+        --show-memory `
+        --show-progress `
+        --include-package=requests `
+        --jobs=$systemThread `
+        --lto=yes `
+        --output-dir=$outputPath `
+        --output-filename=${outputFileName} `
+        ${sourceFile}
+}
+
+# Main script execution
+Remove-Item -Recurse -Path $outputPath -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Path $outputPath
 
-Write-Output "Create Python Venv"
-if (Test-Path -Path buildVenv -PathType Container) {}
-else {python.exe -m venv buildVenv}
+New-VirtualEnvironment
+Install-Packages
+Invoke-ProjectBuild
 
-Write-Output "Install Packages"
-.\buildVenv\Scripts\Activate.ps1
-python.exe -m pip install --upgrade pip -i ${pypiLink}
-pip install -r requirements.txt -i ${pypiLink}
-pip install nuitka -i ${pypiLink}
-
-Write-Output "Build Now"
-python -m nuitka --follow-imports --standalone --onefile `
---show-memory  --show-progress `
---include-package=requests `
---jobs=$systemThread --lto=yes `
---output-dir=$outputPath --output-filename=${outputFileName} `
-${sourceFile}
-
-Read-Host -Prompt "Press any key to continue"
+if ($LASTEXITCODE -ne 0) {
+    Write-Output "Build failed."
+    exit $LASTEXITCODE
+} else {
+    Write-Output "Build succeeded."
+}
