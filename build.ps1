@@ -27,6 +27,7 @@ function Install-Packages {
 function Invoke-ProjectBuild {
     Write-Output "Building project now..."
     python -OO -m nuitka `
+        --console=force `
         --follow-imports `
         --standalone `
         --onefile `
@@ -35,6 +36,7 @@ function Invoke-ProjectBuild {
         --include-package=requests `
         --jobs=$systemThread `
         --lto=yes `
+        --python-flag=-OO `
         --output-dir=$outputPath `
         --output-filename=${outputFileName} `
         ${sourceFile}
