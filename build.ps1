@@ -27,7 +27,7 @@ function Install-Packages {
 function Invoke-ProjectBuild {
     Write-Output "Building project now..."
     python -OO -m nuitka `
-        --console=force `
+        --clang `
         --follow-imports `
         --standalone `
         --onefile `
