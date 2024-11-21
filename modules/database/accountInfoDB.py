@@ -68,7 +68,6 @@ class AccountInfoDB:
             cursor.execute(sql, (name,))
             return cursor.fetchall()
 
-
     def get_name_by_uuid(self, uuid, server):
         """Query user by UUID"""
         sql = "SELECT name FROM accounts WHERE uuid = ? AND server = ? LIMIT 1"
@@ -77,7 +76,6 @@ class AccountInfoDB:
             cursor.execute(sql, (uuid, server))
             result = cursor.fetchone()
             return result[0] if result else None
-
 
     def get_baned_by_uuid(self, uuid, server):
         """Query ban by UUID and ServerId"""
@@ -88,14 +86,12 @@ class AccountInfoDB:
             result = cursor.fetchone()
             return bool(result[0]) if result else None
 
-
     def update_account_name(self, uuid, new_name):
         """Update the account's name based on UUID"""
         sql = "UPDATE accounts SET name = ? WHERE uuid = ?"
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(sql, (new_name, uuid))
-
 
     def ban_account(self, uuid, server):
         """Ban the account"""
@@ -110,7 +106,6 @@ class AccountInfoDB:
         finally:
             self.close()
 
-
     def check_uuid_exists(self, user_uuid, server_id):
         """Check if a user with the given UUID exists in the database"""
         sql = "SELECT * FROM accounts WHERE uuid = ? AND server = ? LIMIT 1"
@@ -118,7 +113,6 @@ class AccountInfoDB:
             cursor = conn.cursor()
             cursor.execute(sql, (user_uuid, server_id))
             return cursor.fetchone() is not None
-
 
     def close(self):
         """Close the database connection for the current thread."""

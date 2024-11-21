@@ -1,13 +1,12 @@
 # coding=utf-8
-# If Python Version is Lower than 3.11, this well be import tomli to change tomllib
 import sys
+import os
 
+# If Python Version is Lower than 3.11 or not found tomllib, this well be import tomli to change tomllib
 try:
     import tomllib
 except ImportError:
     import tomli as tomllib
-
-import os
 
 from print_color import print
 
@@ -17,7 +16,7 @@ from modules.configs.configChecker import validate_config
 
 class Config:
     def __init__(self):
-        self._fileName = gVar.configFileName
+        self._file_name = gVar.configFileName
         self._content = {}
 
     # Setup config
@@ -26,24 +25,24 @@ class Config:
     # False is Failure
     def init(self) -> bool:
         # If config.toml does not exist, create it
-        if not os.path.exists(self._fileName):
-            create_config_file(self._fileName)
+        if not os.path.exists(self._file_name):
+            create_config_file(self._file_name)
             print("Created default config file", tag="success", tag_color='green', color='white')
             return True
 
         # Check config.toml is not folder
-        if not os.path.isfile(self._fileName):
+        if not os.path.isfile(self._file_name):
             print("config.toml not file", tag="Error", tag_color='red', color='white')
             return False
 
         # Check config.toml is can readable
-        if not os.access(self._fileName, os.R_OK):
+        if not os.access(self._file_name, os.R_OK):
             print("config.toml not readable", tag="Error", tag_color='red', color='white')
             return False
         return True
 
     def read(self) -> dict:
-        with open(self._fileName, 'rb') as fff:
+        with open(self._file_name, 'rb') as fff:
             f = tomllib.load(fff)
             if not validate_config(f):
                 sys.exit("Config File is incorrect")

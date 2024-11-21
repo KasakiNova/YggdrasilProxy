@@ -23,7 +23,7 @@ class HasJoinedService:
     def __init__(self):
         self.__username = ""
         self.__server_id = ""
-        self.__proxyEnable = gVar.cfgContext['Proxy']['enable']
+        self.__proxy_enable = gVar.cfgContext['Proxy']['enable']
         self.__proxies = gVar.proxies
         self.blacklist = BlacklistService()
         self.account_db = AccountInfoDB()
@@ -120,11 +120,11 @@ class HasJoinedService:
 
     # request_tool use to requests.get, but support proxy
     def request_tool(self, url, proxy) -> dict:
-        if proxy and self.__proxyEnable:
+        if proxy and self.__proxy_enable:
             response = requests.get(url, proxies=self.__proxies)
         else:
             response = requests.get(url=url)
-        if not response.status_code == 200:
+        if response.status_code != 200:
             return {'status': False}
         return_msg: MsgType = {'status': True, 'data': response.json()}
         return return_msg
@@ -156,7 +156,7 @@ class HasJoinedService:
         """Try to add account to accountDB thread"""
         def try_thread():
             if self.account_db.check_uuid_exists(uuid, server):
-                if not self.account_db.get_name_by_uuid(uuid, server) == name.lower():
+                if self.account_db.get_name_by_uuid(uuid, server) is not name.lower():
                     self.account_db.update_account_name(uuid, name.lower())
             else:
                 self.account_db.insert_account(uuid, name.lower(), server)

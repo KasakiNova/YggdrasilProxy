@@ -16,9 +16,9 @@ def create_index_file(path: str):
 
 class WebApp:
     def __init__(self):
-        self._webDir = gVar.webDir
+        self._web_dir = gVar.webDir
 
         # If web this folder not exist, it will create this folder
-        if not os.path.exists(self._webDir):
-            os.makedirs(self._webDir)
-            create_index_file(self._webDir)
+        if not os.path.exists(self._web_dir):
+            os.makedirs(self._web_dir)
+            create_index_file(self._web_dir)

@@ -66,4 +66,3 @@ def create_config_file(path: str) -> None:
     file_path = path
     with open(file_path, 'w') as configfile:
         configfile.write(default_config)
-    pass
