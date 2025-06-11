@@ -44,7 +44,7 @@ class MainConsole(cmd.Cmd):
             server_name = args_split[1]
         except IndexError:
             server_name = None
-        info = self.blacklistService.add_ban_account(name)
+        info = self.blacklistService.set_account_status(name, 1)
         if info['msg'] == "Success":
             print(f"Successfully banned player {name}") # Confirmation message for successful ban
         elif info['msg'] == "SetError":
@@ -73,12 +73,22 @@ class MainConsole(cmd.Cmd):
                     print(f"Successfully banned player {name}")
                 elif info['msg'] == "SetError":
                     print(f"Failed to ban player {name}")
-                elif info['msg'] == "isBaned":
+                elif info['msg'] == "isBanedOrUnbanned":
                     print(f"Player {name} has been banned")
                 else:
                     print("An error occurred")
         else:
             print("No accounts found or An error occurred.") # Message if no matching accounts are found
+
+    def do_unban(self, args):
+        if not args:
+            print("No arguments given, use: ban <player_name> [<server_name>]")
+            return
+        args_split =  args.split(' ')
+        name = args_split[0]
+        info = self.blacklistService.unban_ban_account(name, 0)
+
+
 
     def do_quit(self, _):
         """Quit Application"""

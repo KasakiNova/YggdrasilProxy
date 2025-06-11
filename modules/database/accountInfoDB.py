@@ -93,13 +93,13 @@ class AccountInfoDB:
             cursor = conn.cursor()
             cursor.execute(sql, (new_name, uuid))
 
-    def ban_account(self, uuid, server):
-        """Ban the account"""
+    def set_account_baned(self, uuid, server, status: int):
+        """Ban and unban the account"""
         sql = "UPDATE accounts SET baned = ? WHERE uuid = ? AND server = ?"
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute(sql, (1, uuid, server))
+                cursor.execute(sql, (status, uuid, server))
             return True
         except sqlite3.Error:
             return False

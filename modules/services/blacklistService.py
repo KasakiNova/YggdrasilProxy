@@ -14,16 +14,18 @@ class BlacklistService:
         else:
             return False
 
-    def add_ban_account(self, name):
+    def set_account_status(self, name, status: int):
+        """Set account status, 1 is baned, 0 is unbanned"""
         account_in_db = self.db_account.get_account_by_name(name.lower())
+        account_in_db.set_status(status)
         account = account_in_db[0]
         if len(account_in_db) == 1:
             uuid = account[0]
             server_id = account[2]
             if account[3] == 0:
-                return {'msg': "Success"} if self.db_account.ban_account(uuid,server_id) else {'msg': "SetError"}
+                return {'msg': "Success"} if self.db_account.set_account_baned(uuid, server_id, status) else {'msg': "SetError"}
             else:
-                return {'msg': "isBaned"}
+                return {'msg': "isBanedOrUnbanned"}
         elif len(account_in_db) > 1:
             return {'msg': "sameName", 'data': account_in_db}
         else:
@@ -35,7 +37,7 @@ class BlacklistService:
                 srv_id is not None and
                 baned is not None):
             if baned == 0:
-                success = self.db_account.ban_account(uuid, srv_id)
+                success = self.db_account.set_account_baned(uuid, srv_id, 1)
                 return {'msg': "Success"} if success else {'msg': "SetError"}
             else:
                 return {'msg': "isBaned"}

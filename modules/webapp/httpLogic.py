@@ -2,29 +2,15 @@
 import json
 import os.path
 
-import ujson
 from flask import Flask, jsonify, request, Response
-from flask.json.provider import JSONProvider
 
 import modules.globalVariables as gVar
 from modules.services.hasJoinedService import HasJoinedService
-
-
-class UjsonProvider(JSONProvider):
-    def dumps(self, obj, **kwargs):
-        return ujson.dumps(obj)
-
-    def loads(self, s, **kwargs):
-        return ujson.loads(s)
-
 
 # Init Flask and some Services
 app = Flask(__name__)
 has_joined_service = HasJoinedService()
 
-# Set json encoder and decoder to ujson
-app.json_provider_class = UjsonProvider
-app.json = UjsonProvider(app)
 
 # Return index.json
 @app.route(rule='/', methods=['GET'])

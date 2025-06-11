@@ -75,8 +75,7 @@ def start_flask_app() -> None:
     from modules.webapp.httpLogic import app
     app.run(host=gVar.cfgContext["General"]["ip"],
             port=gVar.cfgContext["General"]["port"],
-            debug=gVar.debugMode,
-            threaded=True
+            debug=True,threaded=True,use_reloader=False
             )
 
 

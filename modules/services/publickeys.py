@@ -113,7 +113,7 @@ class PublicKeys:
     def check_key(self) -> bool:
         try:
             for key in self.__keys:
-                if key not in ["profilePropertyKeys", "playerCertificateKeys"]:
+                if key not in ["profilePropertyKeys", "playerCertificateKeys", "authenticationKeys"]:
                     return False
                 if not isinstance(self.__keys[key], list):
                     return False
