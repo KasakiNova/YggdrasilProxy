@@ -1,6 +1,11 @@
 # coding=utf-8
 # This is default config.toml context
 default_config = """[General]
+# Enable Debug Mode
+# false: info, true: debug,
+# default: false
+debug=false
+
 # Save Logs
 # default: false
 save-log=false
@@ -20,6 +25,12 @@ CheckKeysTime=7200
 
 # Enable BlackList
 blackListEnable=false
+
+# Disable Show System Info
+# Default: false
+# If true, will not show system info in console
+# and will not save system info to log file
+disableSysInfo=false
 
 [Proxy]
 # Enable Proxy
