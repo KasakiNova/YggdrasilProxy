@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging
+import os
 import sys
 import threading
 from time import sleep
@@ -68,7 +69,9 @@ def start_waitress(thread=10) -> None:
         if e.errno == 98: # Error code 98 is port already use
             print(f"Error: Port {gVar.cfgContext['General']['port']} is already in use.")
         print(f"OS Error: {e}")
-
+    finally:
+        print("Yggdrasil server stopped.")
+        os._exit(0)  # Exit the program
 
 # Don't use other WSGI server, just use flask
 def start_flask_app() -> None:
@@ -91,8 +94,6 @@ def run_wsgi_server() -> None:
 
 def main() -> None:
     """Main Service"""
-    # print System info
-    sysinfo()
 
     # init config and services
     initialize_config()
@@ -103,6 +104,13 @@ def main() -> None:
         print("Config: \n", gVar.cfgContext)
         if gVar.cfgContext['Proxy']['enable']:
             print("ProxiesLink: \n", gVar.proxies)
+
+    # print System info
+    try:
+        if not gVar.cfgContext["General"]["disableSysInfo"]:
+            sysinfo()
+    except Exception:
+        sysinfo()
 
     # Create a new thread to run http server
     http_thread = threading.Thread(target=run_wsgi_server)
